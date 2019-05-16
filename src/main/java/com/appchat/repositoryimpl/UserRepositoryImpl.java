@@ -1,0 +1,91 @@
+package com.appchat.repositoryimpl;
+
+import com.appchat.model.UserModel;
+import com.appchat.repository.UserRepository;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.Date;
+import java.util.List;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+@Repository
+@Transactional(rollbackFor = Exception.class)
+public class UserRepositoryImpl implements UserRepository {
+
+    @Autowired
+    private SessionFactory sessionFactory;
+
+    @Override
+    public List<UserModel> findAll() {
+        Session session = sessionFactory.getCurrentSession();
+        return session.createQuery("FROM UserModel", UserModel.class).getResultList();
+    }
+
+    @Override
+    public UserModel login(UserModel userModel) {
+        String passwordEncryption = Base64.getEncoder().encodeToString(userModel.getPassword().getBytes());
+        userModel.setPassword(passwordEncryption);
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM UserModel u WHERE u.phone = :phone AND u.password = :password ", UserModel.class);
+        query.setParameter("phone", userModel.getPhone());
+        query.setParameter("password", userModel.getPassword());
+        List<UserModel> resultList = query.getResultList();
+        if (resultList.size() > 0) {
+            return resultList.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public UserModel register(UserModel userModel) {
+        userModel.setBirthday(new Date());
+        userModel.setLastactive(new Date());
+        userModel.setGender(false);
+        userModel.setOnline(false);
+        String passwordEncryption = Base64.getEncoder().encodeToString(userModel.getPassword().getBytes());
+        userModel.setPassword(passwordEncryption);
+        if(userExists(userModel)){
+            return null;
+        }
+        Session session = sessionFactory.getCurrentSession();
+        Serializable save = session.save(userModel);
+        System.out.println(save.toString());
+        return userModel;
+    }
+
+    @Override
+    public UserModel updateUser(UserModel user) {
+        return new UserModel();
+    }
+
+    @Override
+    public Boolean userExists(UserModel user) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM UserModel WHERE phone = :phone");
+        query.setParameter("phone", user.getPhone());
+        List<UserModel> users = query.getResultList();
+        if (users != null && users.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public UserModel findUserByPhone(String phone) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM UserModel WHERE phone = :phone");
+        query.setParameter("phone", phone);
+        List<UserModel> users = query.getResultList();
+        if (users != null && users.size() > 0) {
+            return users.get(0);
+        }
+        return null;
+    }
+
+}
