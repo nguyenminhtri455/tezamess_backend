@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().ignoringAntMatchers("/appchat/**");
 
         http.authorizeRequests()
-                .antMatchers("/appchat/api-login**", "/appchat/api-register**", "/appchat/api-welcome**")
+                .antMatchers("/**","/appchat/api-login**", "/appchat/api-register**", "/appchat/api-welcome**")
                 .permitAll();
     
         http.antMatcher("/appchat/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
