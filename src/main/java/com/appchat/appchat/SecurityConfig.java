@@ -43,13 +43,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Disable crsf cho đường dẫn /appchat/**
-        http.csrf().ignoringAntMatchers("/appchat/api**");
+        http.csrf().ignoringAntMatchers("/appchat/api/**");
 
         http.authorizeRequests()
-                .antMatchers("/","/appchat","/appchat/api/login", "/appchat/api/register", "/appchat/api/users")
+                .antMatchers("/","/appchat","/appchat/api-login", "/appchat/api-register", "/appchat/api/users")
                 .permitAll();
     
-        http.antMatcher("/appchat/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
+        http.antMatcher("/appchat/api/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/appchat/api/**").access("hasRole('ROLE_USER')")
                 .antMatchers(HttpMethod.POST, "/appchat/api/**").access("hasRole('ROLE_USER')")

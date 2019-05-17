@@ -26,19 +26,19 @@ public class MainController {
         return new ResponseEntity<>(new WelcomeModel("Đỗ Nguyễn Sĩ","Nguyễn Minh Trí","Luận văn tốt nghiệp!"), HttpStatus.OK);
     }
 
-    @GetMapping("appchat/api/users")
+    @GetMapping("appchat/api-users")
     public ResponseEntity<List<UserModel>> getAll() {
         List<UserModel> list = userServiceImpl.findAll();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @PostMapping("appchat/api/login")
+    @PostMapping("appchat/api-login")
     public ResponseEntity<Object> login(@RequestBody(required = false) String json) {
         return userServiceImpl.login(json);
 
     }
 
-    @PostMapping("appchat/api/register")
+    @PostMapping("appchat/api-register")
     public ResponseEntity<Object> register(@RequestBody(required = false) String json) { 
         return userServiceImpl.register(json);
     }
