@@ -19,6 +19,11 @@ public class MainController {
 
     @Autowired
     private UserServiceImpl userServiceImpl;
+    
+    @GetMapping("/")
+    public ResponseEntity<Object> welcome() {
+        return new ResponseEntity<>(new ResultModel("Đỗ Nguyễn Sĩ","Nguyễn Minh Trí","Luận văn tốt nghiệp!"), HttpStatus.OK);
+    }
 
 
     @GetMapping("appchat/api-welcome")
