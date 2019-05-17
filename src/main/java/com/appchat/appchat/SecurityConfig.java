@@ -43,21 +43,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Disable crsf cho đường dẫn /appchat/**
-        http.csrf().ignoringAntMatchers("/appchat/**");
+        http.csrf().ignoringAntMatchers("/appchat/api**");
 
         http.authorizeRequests()
-                .antMatchers("/appchat/api-login**", "/appchat/api-register**", "/appchat/api-welcome**")
+                .antMatchers("/","/appchat","/appchat/api/login", "/appchat/api/register", "/appchat/api/users")
                 .permitAll();
     
         http.antMatcher("/appchat/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/appchat/**").access("hasRole('ROLE_USER')")
-                .antMatchers(HttpMethod.POST, "/appchat/**").access("hasRole('ROLE_USER')")
-                .antMatchers(HttpMethod.PUT, "/appchat/**").access("hasRole('ROLE_USER')")
-                .antMatchers(HttpMethod.DELETE, "/appchat/**").access("hasRole('ROLE_USER')").and()
+                .antMatchers(HttpMethod.GET, "/appchat/api/**").access("hasRole('ROLE_USER')")
+                .antMatchers(HttpMethod.POST, "/appchat/api/**").access("hasRole('ROLE_USER')")
+                .antMatchers(HttpMethod.PUT, "/appchat/api/**").access("hasRole('ROLE_USER')")
+                .antMatchers(HttpMethod.DELETE, "/appchat/api/**").access("hasRole('ROLE_USER')").and()
                 .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
-    }
-    
-    
+    }   
 }
