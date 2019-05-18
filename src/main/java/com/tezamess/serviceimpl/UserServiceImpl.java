@@ -158,7 +158,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<Object> findUserByPhone(String json) {
+    public ResponseEntity<Object> findUserByPhone(String token, String json) {
         UserModel user;
         try {
             //kiem tra input data khac null
@@ -171,7 +171,6 @@ public class UserServiceImpl implements UserService {
             user = mapper.readValue(json, UserModel.class);
 
             //kiem tra validate UserModel
-            user.setPhone(user.getPhone().trim());
             String validate = userValidator.validatePhoneUser(user);
             if (validate != null) {
                 throw new InvalidateException(validate);

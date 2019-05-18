@@ -49,8 +49,13 @@ public class UserController {
         return userServiceImpl.register(json);
     }
 
+    @PostMapping("appchat/api/search-user")
+    public ResponseEntity<Object> findUserByPhone(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
+        return userServiceImpl.findUserByPhone(token, json);
+    }
+
     @PutMapping("appchat/api/update-user")
-    public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {     
-        return userServiceImpl.updateUser(token,json);
+    public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
+        return userServiceImpl.updateUser(token, json);
     }
 }

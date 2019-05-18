@@ -12,11 +12,11 @@ public interface UserService {
 
     ResponseEntity<Object> register(String json);
 
-    ResponseEntity<Object> updateUser(String token, String json);
-
-    ResponseEntity<Object> findUserByPhone(String json);
-
     ResponseEntity<Object> findUserById(int id);
 
     UserModel getUserByPhone(String phone);
+
+    ResponseEntity<Object> updateUser(String token, String json);
+
+    ResponseEntity<Object> findUserByPhone(String token, String json);
 }

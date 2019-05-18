@@ -107,6 +107,8 @@ public class UserValidator {
             return environment.getProperty("errer.null");
         }
 
+        userModel.setPhone(userModel.getPhone().trim());
+
         //kiem tra khac rong
         if (userModel.getPhone().isEmpty()) {
             return environment.getProperty("errer.isempty");
