@@ -1,5 +1,5 @@
 
-package com.appchat.service;
+package com.tezamess.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -59,6 +59,7 @@ public class JwtService {
             }
         } catch (JOSEException | ParseException e) {
             System.out.println(e.toString());
+            return claims;
         }
         return claims;
     }
@@ -76,10 +77,14 @@ public class JwtService {
     }
 
     public String getPhoneFromToken(String token) {
+        
         String phone = null;
         try {
             JWTClaimsSet claims = getClaimsFromToken(token);
-            phone = claims.getStringClaim(PHONE);
+            if(claims == null){
+                return phone;
+            }
+            phone = claims.getStringClaim(PHONE);      
         } catch (ParseException e) {
             System.out.println(e.toString());
         }

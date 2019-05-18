@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.appchat.appchat;
+package com.tezamess.main;
 
 import java.util.Properties;
 import javax.sql.DataSource;
@@ -42,7 +42,7 @@ public class HibernateConfig {
                 env.getProperty("spring.jpa.properties.hibernate.current_session_context_class"));
         LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
         // Package contain entity classes
-        factoryBean.setPackagesToScan("com.appchat.model");
+        factoryBean.setPackagesToScan("com.tezamess.model");
         factoryBean.setDataSource(dataSource);
         factoryBean.setHibernateProperties(properties);
         factoryBean.afterPropertiesSet();

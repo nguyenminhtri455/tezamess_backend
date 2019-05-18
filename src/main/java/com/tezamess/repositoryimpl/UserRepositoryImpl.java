@@ -1,9 +1,8 @@
-package com.appchat.repositoryimpl;
+package com.tezamess.repositoryimpl;
 
-import com.appchat.model.UserModel;
-import com.appchat.repository.UserRepository;
+import com.tezamess.model.UserModel;
+import com.tezamess.repository.UserRepository;
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +49,7 @@ public class UserRepositoryImpl implements UserRepository {
         userModel.setOnline(false);
         String passwordEncryption = Base64.getEncoder().encodeToString(userModel.getPassword().getBytes());
         userModel.setPassword(passwordEncryption);
-        if(userExists(userModel)){
+        if (userExists(userModel)) {
             return null;
         }
         Session session = sessionFactory.getCurrentSession();
@@ -61,7 +60,16 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public UserModel updateUser(UserModel user) {
-        return new UserModel();
+        Session session = sessionFactory.getCurrentSession();      
+        UserModel userModel = findUserByPhone(user.getPhone());
+        if(userModel != null){
+            userModel.setName(user.getName());
+            userModel.setGender(user.getGender());
+            userModel.setBirthday(user.getBirthday());
+            userModel.setUrlavatar(user.getUrlavatar());
+            return userModel;
+        }
+        return null;
     }
 
     @Override
@@ -81,6 +89,18 @@ public class UserRepositoryImpl implements UserRepository {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("FROM UserModel WHERE phone = :phone");
         query.setParameter("phone", phone);
+        List<UserModel> users = query.getResultList();
+        if (users != null && users.size() > 0) {
+            return users.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public UserModel findUserById(int id) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM UserModel WHERE id = :id");
+        query.setParameter("id", id);
         List<UserModel> users = query.getResultList();
         if (users != null && users.size() > 0) {
             return users.get(0);

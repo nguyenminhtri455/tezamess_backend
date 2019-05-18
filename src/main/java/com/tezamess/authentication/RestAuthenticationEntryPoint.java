@@ -1,6 +1,6 @@
-package com.appchat.authentication;
+package com.tezamess.authentication;
 
-import com.appchat.model.ResultModel;
+import com.tezamess.model.ResultModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 

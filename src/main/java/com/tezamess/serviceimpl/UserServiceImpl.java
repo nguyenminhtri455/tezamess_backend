@@ -1,16 +1,15 @@
-package com.appchat.serviceimpl;
+package com.tezamess.serviceimpl;
 
-import com.appchat.exception.InvalidateException;
-import com.appchat.model.ResultModel;
-import com.appchat.model.UserModel;
-import com.appchat.repositoryimpl.UserRepositoryImpl;
-import com.appchat.service.JwtService;
-import com.appchat.service.UserService;
-import com.appchat.validator.UserValidator;
+import com.tezamess.exception.InvalidateException;
+import com.tezamess.model.ResultModel;
+import com.tezamess.model.UserModel;
+import com.tezamess.repositoryimpl.UserRepositoryImpl;
+import com.tezamess.service.JwtService;
+import com.tezamess.service.UserService;
+import com.tezamess.validator.UserValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Base64;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -61,6 +60,7 @@ public class UserServiceImpl implements UserService {
             if (validate != null) {
                 throw new InvalidateException(validate);
             }
+            
         } catch (IOException ex) {
             return new ResponseEntity<>(new ResultModel(environment.getProperty("json.invalid")), HttpStatus.BAD_REQUEST);
         } catch (InvalidateException ex) {
@@ -96,9 +96,6 @@ public class UserServiceImpl implements UserService {
             user = mapper.readValue(json, UserModel.class);
 
             //kiem tra validate UserModel
-            user.setPhone(user.getPhone().trim());
-            user.setName(user.getName().trim());
-            user.setPassword(user.getPassword().trim());
             String validate = userValidator.validateRegister(user);
             if (validate != null) {
                 throw new InvalidateException(validate);
@@ -121,12 +118,90 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserModel updateUser(UserModel user) {
-        return userRepositoryImpl.updateUser(user);
+    public ResponseEntity<Object> updateUser(String token, String json) {
+        UserModel user;
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+            
+            //convert input data thanh UserModel
+            ObjectMapper mapper = new ObjectMapper();
+            user = mapper.readValue(json, UserModel.class);
+       
+            //kiem tra validate UserModel
+            String validate = userValidator.validateUpdate(user);
+            if (validate != null) {
+                throw new InvalidateException(validate);
+            }
+
+            //kiem tra phone number co trung voi phone number cua token khong
+            if (!jwtService.getPhoneFromToken(token).equals(user.getPhone())) {
+                return new ResponseEntity<>(new ResultModel(environment.getProperty("error.denied")), HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (IOException ex) {
+            return new ResponseEntity<>(new ResultModel(environment.getProperty("json.invalid")), HttpStatus.BAD_REQUEST);
+        } catch (InvalidateException ex) {
+            return new ResponseEntity<>(new ResultModel(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.server")), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        UserModel userModel = userRepositoryImpl.updateUser(user);
+        //neu userModel la null thi tai khoan da ton tai
+        if (userModel == null) {
+            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.update.unexists")), HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(userModel, HttpStatus.OK);
     }
 
     @Override
-    public UserModel findUserByPhone(String phone) {
+    public ResponseEntity<Object> findUserByPhone(String json) {
+        UserModel user;
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+
+            //convert input data thanh UserModel
+            ObjectMapper mapper = new ObjectMapper();
+            user = mapper.readValue(json, UserModel.class);
+
+            //kiem tra validate UserModel
+            user.setPhone(user.getPhone().trim());
+            String validate = userValidator.validatePhoneUser(user);
+            if (validate != null) {
+                throw new InvalidateException(validate);
+            }
+
+        } catch (IOException ex) {
+            return new ResponseEntity<>(new ResultModel(environment.getProperty("json.invalid")), HttpStatus.BAD_REQUEST);
+        } catch (InvalidateException ex) {
+            return new ResponseEntity<>(new ResultModel(ex.getMessage()), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.server")), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        UserModel userModel = userRepositoryImpl.findUserByPhone(user.getPhone());
+        //neu userModel la null thi tai khoan khong ton tai
+        if (userModel == null) {
+            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.update.unexists")), HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(userModel, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> findUserById(int id) {
+        UserModel user = userRepositoryImpl.findUserById(id);
+        user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
+
+    @Override
+    public UserModel getUserByPhone(String phone) {
         return userRepositoryImpl.findUserByPhone(phone);
     }
 

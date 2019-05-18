@@ -1,8 +1,8 @@
-package com.appchat.appchat;
+package com.tezamess.main;
 
-import com.appchat.authentication.CustomAccessDeniedHandler;
-import com.appchat.authentication.JwtAuthenticationTokenFilter;
-import com.appchat.authentication.RestAuthenticationEntryPoint;
+import com.tezamess.authentication.CustomAccessDeniedHandler;
+import com.tezamess.authentication.JwtAuthenticationTokenFilter;
+import com.tezamess.authentication.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -46,7 +46,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().ignoringAntMatchers("/appchat/api/**");
 
         http.authorizeRequests()
-                .antMatchers("/","/appchat","/appchat/api-login", "/appchat/api-register", "/appchat/api/users")
+                .antMatchers("/","/appchat","/appchat/api-login", "/appchat/api-register", "/appchat/api-users","appchat/api-user/{id}")
                 .permitAll();
     
         http.antMatcher("/appchat/api/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()

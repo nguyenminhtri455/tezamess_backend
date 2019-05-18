@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.appchat.repository;
+package com.tezamess.repository;
 
-import com.appchat.model.UserModel;
+import com.tezamess.model.UserModel;
 import java.util.List;
 
 /**
@@ -21,6 +21,8 @@ public interface UserRepository {
     UserModel register(UserModel user);
 
     UserModel updateUser(UserModel user);
+    
+    UserModel findUserById(int id);
 
     UserModel findUserByPhone(String phone);
 

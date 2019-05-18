@@ -1,5 +1,5 @@
 
-package com.appchat.exception;
+package com.tezamess.exception;
 
 public class InvalidateException extends RuntimeException{
 

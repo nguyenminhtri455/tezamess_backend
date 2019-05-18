@@ -11,7 +11,7 @@
     <groupId>com.appchat</groupId>
     <artifactId>appchat</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>appchat</name>
+    <name>tezamess</name>
     <description>Build AppChat for Spring Boot</description>
 
     <properties>

@@ -1,8 +1,8 @@
-package com.appchat.authentication;
+package com.tezamess.authentication;
 
-import com.appchat.model.UserModel;
-import com.appchat.service.JwtService;
-import com.appchat.service.UserService;
+import com.tezamess.model.UserModel;
+import com.tezamess.service.JwtService;
+import com.tezamess.service.UserService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +38,7 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
         String authToken = httpRequest.getHeader(TOKEN_HEADER);
         if (jwtService.validateTokenLogin(authToken)) {
             String phone = jwtService.getPhoneFromToken(authToken);          
-            UserModel user = userService.findUserByPhone(phone);
+            UserModel user = userService.getUserByPhone(phone);
             if (user != null) {
                 boolean enabled = true;
                 boolean accountNonExpired = true;

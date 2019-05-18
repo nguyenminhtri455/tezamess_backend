@@ -1,4 +1,4 @@
-package com.appchat.model;
+package com.tezamess.model;
 
 public class ResultModel {
 

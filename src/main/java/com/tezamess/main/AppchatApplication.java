@@ -1,6 +1,6 @@
-package com.appchat.appchat;
+package com.tezamess.main;
 
-import com.appchat.validator.UserValidator;
+import com.tezamess.validator.UserValidator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.appchat.*")
+@ComponentScan(basePackages = "com.tezamess.*")
 @EnableAutoConfiguration(exclude = { DataSourceAutoConfiguration.class,
     DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class })
 public class AppchatApplication {
