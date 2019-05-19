@@ -22,39 +22,39 @@ public class UserController {
     @Autowired
     private UserServiceImpl userServiceImpl;
 
-    @GetMapping(value = {"/", "/appchat"})
+    @GetMapping(value = {"/", "/tezamess"})
     public ResponseEntity<Object> welcome() {
         return new ResponseEntity<>(new WelcomeModel("Đỗ Nguyễn Sĩ", "Nguyễn Minh Trí", "Luận văn tốt nghiệp!"), HttpStatus.OK);
     }
 
-    @GetMapping("appchat/api-users")
+    @GetMapping("tezamess/api-users")
     public ResponseEntity<List<UserModel>> getAll() {
         List<UserModel> list = userServiceImpl.findAll();
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @GetMapping("appchat/api-user/{id}")
+    @GetMapping("tezamess/api-user/{id}")
     public ResponseEntity<Object> getUserById(@PathVariable("id") int id) {
         return userServiceImpl.findUserById(id);
     }
 
-    @PostMapping("appchat/api-login")
+    @PostMapping("tezamess/api-login")
     public ResponseEntity<Object> login(@RequestBody(required = false) String json) {
         return userServiceImpl.login(json);
 
     }
 
-    @PostMapping("appchat/api-register")
+    @PostMapping("tezamess/api-register")
     public ResponseEntity<Object> register(@RequestBody(required = false) String json) {
         return userServiceImpl.register(json);
     }
 
-    @PostMapping("appchat/api/search-user")
+    @PostMapping("tezamess/api/search-user")
     public ResponseEntity<Object> findUserByPhone(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.findUserByPhone(token, json);
     }
 
-    @PutMapping("appchat/api/update-user")
+    @PutMapping("tezamess/api/update-user")
     public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.updateUser(token, json);
     }

@@ -43,18 +43,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Disable crsf cho đường dẫn /appchat/**
-        http.csrf().ignoringAntMatchers("/appchat/api/**");
+        http.csrf().ignoringAntMatchers("/tezamess/api/**");
 
         http.authorizeRequests()
-                .antMatchers("/","/appchat","/appchat/api-login", "/appchat/api-register", "/appchat/api-users","appchat/api-user/{id}")
+                .antMatchers("/","/tezamess","/tezamess/api-login", "/tezamess/api-register", "/tezamess/api-users","tezamess/api-user/{id}")
                 .permitAll();
     
         http.antMatcher("/appchat/api/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/appchat/api/**").access("hasRole('ROLE_USER')")
-                .antMatchers(HttpMethod.POST, "/appchat/api/**").access("hasRole('ROLE_USER')")
-                .antMatchers(HttpMethod.PUT, "/appchat/api/**").access("hasRole('ROLE_USER')")
-                .antMatchers(HttpMethod.DELETE, "/appchat/api/**").access("hasRole('ROLE_USER')").and()
+                .antMatchers(HttpMethod.GET, "/tezamess/api/**").access("hasRole('ROLE_USER')")
+                .antMatchers(HttpMethod.POST, "/tezamess/api/**").access("hasRole('ROLE_USER')")
+                .antMatchers(HttpMethod.PUT, "/tezamess/api/**").access("hasRole('ROLE_USER')")
+                .antMatchers(HttpMethod.DELETE, "/tezamess/api/**").access("hasRole('ROLE_USER')").and()
                 .addFilterBefore(jwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler());
     }   
