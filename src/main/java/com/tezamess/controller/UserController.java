@@ -41,7 +41,6 @@ public class UserController {
     @PostMapping("tezamess/api-login")
     public ResponseEntity<Object> login(@RequestBody(required = false) String json) {
         return userServiceImpl.login(json);
-
     }
 
     @PostMapping("tezamess/api-register")
