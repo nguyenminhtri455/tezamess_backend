@@ -9,6 +9,7 @@ import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class UserController {
+public class UserController implements ErrorController {
 
     @Autowired
     private UserServiceImpl userServiceImpl;
@@ -59,5 +60,15 @@ public class UserController {
     @PutMapping("tezamess/api/update-user")
     public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.updateUser(token, json);
+    }
+
+    @GetMapping("/error")
+    public ResponseEntity<Object> error() {
+        return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, "Not found", new Date()), HttpStatus.NOT_FOUND);
+    }
+
+    @Override
+    public String getErrorPath() {
+        return "/error";
     }
 }

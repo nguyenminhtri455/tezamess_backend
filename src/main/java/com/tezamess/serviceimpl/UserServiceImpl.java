@@ -1,7 +1,6 @@
 package com.tezamess.serviceimpl;
 
 import com.tezamess.exception.InvalidateException;
-import com.tezamess.model.ResultModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.repositoryimpl.UserRepositoryImpl;
 import com.tezamess.service.JwtService;
