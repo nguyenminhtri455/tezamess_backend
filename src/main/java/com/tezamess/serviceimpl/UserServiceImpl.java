@@ -8,8 +8,11 @@ import com.tezamess.service.JwtService;
 import com.tezamess.service.UserService;
 import com.tezamess.validator.UserValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tezamess.model.ResultModelV2;
+import com.tezamess.model.ResultModelV2.Status;
 import java.util.Base64;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -60,26 +63,26 @@ public class UserServiceImpl implements UserService {
             if (validate != null) {
                 throw new InvalidateException(validate);
             }
-            
+
         } catch (IOException ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("json.invalid")), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
         } catch (InvalidateException ex) {
-            return new ResponseEntity<>(new ResultModel(ex.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.server")), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         //kiem tra account trong database
         UserModel userResponse = userRepositoryImpl.login(user);
         if (userResponse == null) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("login.error")), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("login.error"), new Date()), HttpStatus.BAD_REQUEST);
         }
 
         // tao header tra ve token va account info
         HttpHeaders httpHeaders = new HttpHeaders();
         String token = jwtService.generateTokenLogin(userResponse.getPhone());
         httpHeaders.add("token", token);
-        return ResponseEntity.ok().headers(httpHeaders).body(userResponse);
+        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), userResponse, Status.SUCCESS.name(), new Date()));
     }
 
     @Override
@@ -102,19 +105,19 @@ public class UserServiceImpl implements UserService {
             }
 
         } catch (IOException ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("json.invalid")), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
         } catch (InvalidateException ex) {
-            return new ResponseEntity<>(new ResultModel(ex.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.server")), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         UserModel userModel = userRepositoryImpl.register(user);
         //neu userModel la null thi tai khoan da ton tai
         if (userModel == null) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.register.exists")), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("error.register.exists"), new Date()), HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(userModel, HttpStatus.OK);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 
     @Override
@@ -125,11 +128,11 @@ public class UserServiceImpl implements UserService {
             if (json == null) {
                 throw new IOException();
             }
-            
+
             //convert input data thanh UserModel
             ObjectMapper mapper = new ObjectMapper();
             user = mapper.readValue(json, UserModel.class);
-       
+
             //kiem tra validate UserModel
             String validate = userValidator.validateUpdate(user);
             if (validate != null) {
@@ -138,23 +141,23 @@ public class UserServiceImpl implements UserService {
 
             //kiem tra phone number co trung voi phone number cua token khong
             if (!jwtService.getPhoneFromToken(token).equals(user.getPhone())) {
-                return new ResponseEntity<>(new ResultModel(environment.getProperty("error.denied")), HttpStatus.UNAUTHORIZED);
+                return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("error.denied"), new Date()), HttpStatus.UNAUTHORIZED);
             }
 
         } catch (IOException ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("json.invalid")), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
         } catch (InvalidateException ex) {
-            return new ResponseEntity<>(new ResultModel(ex.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.server")), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        
+
         UserModel userModel = userRepositoryImpl.updateUser(user);
-        //neu userModel la null thi tai khoan da ton tai
+        //neu userModel la null thi tai khoan khong ton tai
         if (userModel == null) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.update.unexists")), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(userModel, HttpStatus.OK);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 
     @Override
@@ -177,26 +180,29 @@ public class UserServiceImpl implements UserService {
             }
 
         } catch (IOException ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("json.invalid")), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
         } catch (InvalidateException ex) {
-            return new ResponseEntity<>(new ResultModel(ex.getMessage()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.server")), HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         UserModel userModel = userRepositoryImpl.findUserByPhone(user.getPhone());
         //neu userModel la null thi tai khoan khong ton tai
         if (userModel == null) {
-            return new ResponseEntity<>(new ResultModel(environment.getProperty("error.update.unexists")), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(userModel, HttpStatus.OK);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<Object> findUserById(int id) {
         UserModel user = userRepositoryImpl.findUserById(id);
-        user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        if (user != null) {
+            user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
+            return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), user, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null,environment.getProperty("error.unexists"), new Date()), HttpStatus.OK);
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.tezamess.model;
 public class ResultModel {
 
     private String error;
-
     public ResultModel() {
     }
 

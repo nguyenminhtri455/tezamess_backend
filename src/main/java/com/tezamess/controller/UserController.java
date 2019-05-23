@@ -1,9 +1,12 @@
 package com.tezamess.controller;
 
+import com.tezamess.model.ResultModelV2;
+import com.tezamess.model.ResultModelV2.Status;
 import com.tezamess.model.UserModel;
 import com.tezamess.model.WelcomeModel;
 
 import com.tezamess.serviceimpl.UserServiceImpl;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,9 +31,9 @@ public class UserController {
     }
 
     @GetMapping("tezamess/api-users")
-    public ResponseEntity<List<UserModel>> getAll() {
+    public ResponseEntity<Object> getAll() {
         List<UserModel> list = userServiceImpl.findAll();
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), list, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 
     @GetMapping("tezamess/api-user/{id}")
