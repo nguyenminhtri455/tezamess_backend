@@ -49,6 +49,7 @@ public class UserController implements ErrorController {
 
     @PostMapping("tezamess/api-register")
     public ResponseEntity<Object> register(@RequestBody(required = false) String json) {
+        System.out.println(json);
         return userServiceImpl.register(json);
     }
 
@@ -64,7 +65,7 @@ public class UserController implements ErrorController {
 
     @GetMapping("/error")
     public ResponseEntity<Object> error() {
-        return new ResponseEntity<>(new ResultModelV2(Status.ERROR.getStatus(), null, "Not found", new Date()), HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(new ResultModelV2(Status.ERROR_NOT_FOUND.getStatus(), null, Status.ERROR_NOT_FOUND.name(), new Date()), HttpStatus.NOT_FOUND);
     }
 
     @Override

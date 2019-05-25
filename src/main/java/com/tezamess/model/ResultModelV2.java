@@ -10,7 +10,9 @@ public class ResultModelV2 {
     private Date time;
 
     public enum Status {
-        SUCCESS(0), ERROR(1), ERROR_SERVER(2);
+        SUCCESS(0), ERROR_JSON(1), ERROR_VALIDATE(2),
+        ERROR_FAILED(3), ERROR_AUTHORICATION(4),
+        ERROR_SERVER(5), ERROR_NOT_FOUND(6);
 
         private int status;
 
@@ -25,9 +27,8 @@ public class ResultModelV2 {
         public void setStatus(int status) {
             this.status = status;
         }
-        
+
     }
-    
 
     public ResultModelV2() {
     }
@@ -70,6 +71,5 @@ public class ResultModelV2 {
     public void setDate(Date time) {
         this.time = time;
     }
-    
-    
+
 }
