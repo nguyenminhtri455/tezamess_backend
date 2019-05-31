@@ -12,7 +12,7 @@ public class FileUtils {
 //    private final String root = "/tezamess/src/main/resources/static/profile";
     
     private final String path = "http://tezamess-tezamess.7e14.starter-us-west-2.openshiftapps.com/var/";
-    private final String root = "/usr/var/profile";
+    private final String root = "/usr/var";
 
     public String uploadAvatar(String valueBase64, String name) {
         byte[] value = Base64.getDecoder().decode(valueBase64);
@@ -21,7 +21,7 @@ public class FileUtils {
         if (!file.exists()) {
             file.mkdirs();
         }
-        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(root + File.separator + name))) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(new File(root + File.separator + "profile/" + name))) {
             fileOutputStream.write(value);
         } catch (IOException e) {
             e.printStackTrace();
