@@ -10,8 +10,9 @@ public class FileUtils {
 //    private final String path = "http://192.168.0.104:8080/profile/";
 //    private final String path = "http://172.16.26.173:8080/profile/";
 //    private final String root = "/tezamess/src/main/resources/static/profile";
+    
     private final String path = "http://tezamess-tezamess.7e14.starter-us-west-2.openshiftapps.com/var/";
-    private final String root = "/usr/var";
+    private final String root = "/usr/var/profile";
 
     public String uploadAvatar(String valueBase64, String name) {
         byte[] value = Base64.getDecoder().decode(valueBase64);
