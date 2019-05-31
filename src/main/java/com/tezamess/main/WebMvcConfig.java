@@ -17,7 +17,7 @@ public class WebMvcConfig implements WebMvcConfigurer{
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-      registry.addResourceHandler("/profile/**").addResourceLocations("file:profile/");
+      registry.addResourceHandler("/profile/**").addResourceLocations("file:/home/jboss/profile/");
     }
     
     
