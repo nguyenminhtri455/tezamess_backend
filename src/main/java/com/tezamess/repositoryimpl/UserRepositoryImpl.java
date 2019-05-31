@@ -60,13 +60,15 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public UserModel updateUser(UserModel user) {
-        Session session = sessionFactory.getCurrentSession();      
+        Session session = sessionFactory.getCurrentSession();
         UserModel userModel = findUserByPhone(user.getPhone());
-        if(userModel != null){
+        if (userModel != null) {
             userModel.setName(user.getName());
             userModel.setGender(user.getGender());
             userModel.setBirthday(user.getBirthday());
-            userModel.setUrlavatar(user.getUrlavatar());
+            if (user.getUrlavatar() != null) {
+                userModel.setUrlavatar(user.getUrlavatar());
+            }
             return userModel;
         }
         return null;

@@ -9,15 +9,13 @@ import com.tezamess.validator.UserValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
+import com.tezamess.utils.FileUtils;
 import java.util.Base64;
 import java.io.IOException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
@@ -41,6 +39,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserValidator userValidator;
+
+    @Autowired
+    private FileUtils fileUtils;
 
     @Override
     public List<UserModel> findAll() {
@@ -129,19 +130,45 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    
     @Override
     public ResponseEntity<Object> updateUser(String token, String json) {
+        //regex base64
+        String regex = "^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)?$";
         UserModel user;
+        String urlAvatar;
         try {
             //kiem tra input data khac null
             if (json == null) {
                 throw new IOException();
             }
+            System.out.println(json);
+            JSONObject jsonObject = new JSONObject(json);
+            if (jsonObject.has("avatar")) {
+                Object object = jsonObject.get("avatar");
+                if (!object.toString().matches(regex)) {
+                    JSONObject avatar = new JSONObject(object.toString());
+                    urlAvatar = fileUtils.uploadAvatar(avatar.getString("valueBase64"), avatar.getString("name"));
+                    jsonObject.put("urlavatar", urlAvatar);
+                }
+                jsonObject.remove("avatar");
+            }
+
+            String d = jsonObject.getString("birthday");
+            Date date = userValidator.validateDateTimeStamp(d);
+            if (date == null) {
+                date = userValidator.validateDateDefault(d);
+                if (date == null) {
+                    throw new InvalidateException(environment.getProperty("date.invalid"));
+                }
+            }
+            //convert Date to Timestamp in db
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            jsonObject.put("birthday", format.format(date));
 
             //convert input data thanh UserModel
             ObjectMapper mapper = new ObjectMapper();
-            user = mapper.readValue(json, UserModel.class);
-
+            user = mapper.readValue(jsonObject.toString(), UserModel.class);
             //kiem tra validate UserModel
             String validate = userValidator.validateUpdate(user);
             if (validate != null) {
@@ -158,6 +185,7 @@ public class UserServiceImpl implements UserService {
         } catch (InvalidateException ex) {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_VALIDATE.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
         } catch (Exception ex) {
+            System.out.println(ex.toString());
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -167,6 +195,7 @@ public class UserServiceImpl implements UserService {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+
     }
 
     @Override
@@ -201,6 +230,7 @@ public class UserServiceImpl implements UserService {
         if (userModel == null) {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
         }
+        userModel.setPassword(null);
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 

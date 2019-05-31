@@ -8,6 +8,7 @@ import com.tezamess.model.WelcomeModel;
 import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
@@ -47,8 +48,8 @@ public class UserController implements ErrorController {
         return userServiceImpl.login(json);
     }
 
-    @PostMapping("tezamess/api-register")
-    public ResponseEntity<Object> register(@RequestBody(required = false) String json) {
+    @PostMapping(value = "tezamess/api-register", produces = "application/json; charset=UTF-8")
+    public ResponseEntity<Object> register(@RequestBody(required = false) String json, HttpServletRequest request) {
         System.out.println(json);
         return userServiceImpl.register(json);
     }

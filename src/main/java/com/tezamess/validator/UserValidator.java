@@ -1,6 +1,9 @@
 package com.tezamess.validator;
 
 import com.tezamess.model.UserModel;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -121,6 +124,36 @@ public class UserValidator {
 
         return null;
 
+    }
+
+    public Date validateDateTimeStamp(String date) {
+        Date d;
+        try {
+            //Date Timestamp
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.SSSZ");
+            d = format.parse(date);
+            return d;
+        } catch (ParseException ex) {
+            return null;
+        }
+    }
+
+    public Date validateDateDefault(String date) {
+        Date d;
+        try {
+            //Date default
+            SimpleDateFormat formatDate = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy");
+            d = formatDate.parse(date);
+            if(date.equals(formatDate.format(d))){
+               d = validateDateTimeStamp(date); 
+            }        
+            if (d != null) {
+                return d;
+            }
+        } catch (ParseException ex) {
+            return null;
+        }
+        return null;
     }
 
 }

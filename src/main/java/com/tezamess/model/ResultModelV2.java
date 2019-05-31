@@ -12,7 +12,7 @@ public class ResultModelV2 {
     public enum Status {
         SUCCESS(0), ERROR_JSON(1), ERROR_VALIDATE(2),
         ERROR_FAILED(3), ERROR_AUTHORICATION(4),
-        ERROR_SERVER(5), ERROR_NOT_FOUND(6);
+        ERROR_SERVER(5), ERROR_NOT_FOUND(6), ERROR_ACCESS_DENIED(7);
 
         private int status;
 

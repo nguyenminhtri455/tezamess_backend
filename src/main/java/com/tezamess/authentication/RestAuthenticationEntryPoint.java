@@ -1,8 +1,9 @@
 package com.tezamess.authentication;
 
-import com.tezamess.model.ResultModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tezamess.model.ResultModelV2;
 import java.io.IOException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,8 +15,11 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response,
             AuthenticationException authException) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ResultModel resultModel = new ResultModel("Unauthorized");
+        ResultModelV2 resultModelV2 = new ResultModelV2(ResultModelV2.Status.ERROR_AUTHORICATION.getStatus()
+                , null
+                , ResultModelV2.Status.ERROR_AUTHORICATION.name()
+                , new Date());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write(mapper.writeValueAsString(resultModel));
+        response.getWriter().write(mapper.writeValueAsString(resultModelV2));
     }
 }
