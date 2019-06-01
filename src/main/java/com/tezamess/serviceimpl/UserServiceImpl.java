@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,7 +85,7 @@ public class UserServiceImpl implements UserService {
         //kiem tra account trong database
         UserModel userResponse = userRepositoryImpl.login(user);
         if (userResponse == null) {
-            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("login.error"), new Date()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("login.error"), new Date()), HttpStatus.OK);
         }
 
         // tao header tra ve token va account info
@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
         UserModel userModel = userRepositoryImpl.register(user);
         //neu userModel la null thi tai khoan da ton tai
         if (userModel == null) {
-            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.register.exists"), new Date()), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.register.exists"), new Date()), HttpStatus.OK);
         }
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -196,7 +196,7 @@ public class UserServiceImpl implements UserService {
         UserModel userModel = userRepositoryImpl.updateUser(user);
         //neu userModel la null thi tai khoan khong ton tai
         if (userModel == null) {
-            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
 
@@ -232,7 +232,7 @@ public class UserServiceImpl implements UserService {
         UserModel userModel = userRepositoryImpl.findUserByPhone(user.getPhone());
         //neu userModel la null thi tai khoan khong ton tai
         if (userModel == null) {
-            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.OK);
         }
         userModel.setPassword(null);
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
@@ -266,12 +266,28 @@ public class UserServiceImpl implements UserService {
         } catch (IOException | JSONException ex) {
             System.out.println(ex.getMessage());
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
-        } catch (Exception ex) {         
+        } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        List<String> listPhone = userRepositoryImpl.checkUserUsingApp(array.toList());
-        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), listPhone, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+        List<Object[]> listUserModel = userRepositoryImpl.checkUserUsingApp(array.toList());
+        if(listUserModel == null){
+            return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), null, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+        }
+      
+        int size = listUserModel.size();
+        List<Map<String, Object>> list = new ArrayList<>();
+        listUserModel
+                .stream()
+                .forEach(t -> {
+                    Map<String, Object> map = new HashMap();
+                    map.put("phone", t[0]);
+                    map.put("name", t[1]);
+                    map.put("urlavatar", t[2]);
+                    list.add(map);
+                });
+
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), list, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 }

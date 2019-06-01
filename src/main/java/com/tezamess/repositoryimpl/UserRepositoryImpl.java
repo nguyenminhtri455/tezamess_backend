@@ -101,23 +101,21 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public UserModel findUserById(int id) {
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("FROM UserModel WHERE id = :id");
-        query.setParameter("id", id);
-        List<UserModel> users = query.getResultList();
-        if (users != null && users.size() > 0) {
-            return users.get(0);
+        UserModel user = session.get(UserModel.class, id);
+        if (user != null) {
+            return user;
         }
         return null;
     }
 
     @Override
-    public List<String> checkUserUsingApp(List<Object> listPhone) {
+    public List<Object[]> checkUserUsingApp(List<Object> listPhone) {
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("SELECT u.phone FROM UserModel as u WHERE u.phone IN :phones");
+        Query query = session.createQuery("SELECT u.phone, u.name, u.urlavatar FROM UserModel as u WHERE u.phone IN :phones");
         query.setParameterList("phones", listPhone);
-        List<String> phones = query.getResultList();
-        if (phones != null && phones.size() > 0) {
-            return phones;
+        List<Object[]> users = query.getResultList();
+        if (users != null && users.size() > 0) {
+            return users;
         }
         return null;
     }
