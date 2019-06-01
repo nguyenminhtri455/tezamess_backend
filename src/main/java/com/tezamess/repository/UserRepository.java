@@ -21,11 +21,13 @@ public interface UserRepository {
     UserModel register(UserModel user);
 
     UserModel updateUser(UserModel user);
-    
+
     UserModel findUserById(int id);
 
     UserModel findUserByPhone(String phone);
 
     Boolean userExists(UserModel user);
+
+    List<String> checkUserUsingApp(List<Object> listPhone);
 
 }

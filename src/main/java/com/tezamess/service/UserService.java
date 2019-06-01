@@ -19,4 +19,6 @@ public interface UserService {
     ResponseEntity<Object> updateUser(String token, String json);
 
     ResponseEntity<Object> findUserByPhone(String token, String json);
+
+    ResponseEntity<Object> userUsingApp(String token, String json);
 }

@@ -13,8 +13,13 @@ import com.tezamess.utils.FileUtils;
 import java.util.Base64;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -130,7 +135,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    
     @Override
     public ResponseEntity<Object> updateUser(String token, String json) {
         //regex base64
@@ -211,8 +215,8 @@ public class UserServiceImpl implements UserService {
             ObjectMapper mapper = new ObjectMapper();
             user = mapper.readValue(json, UserModel.class);
 
-            //kiem tra validate UserModel
-            String validate = userValidator.validatePhoneUser(user);
+            //kiem tra validate phone number
+            String validate = userValidator.validatePhoneUser(user.getPhone());
             if (validate != null) {
                 throw new InvalidateException(validate);
             }
@@ -249,4 +253,25 @@ public class UserServiceImpl implements UserService {
         return userRepositoryImpl.findUserByPhone(phone);
     }
 
+    @Override
+    public ResponseEntity<Object> userUsingApp(String token, String json) {
+        JSONArray array;
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+            array = new JSONArray(json);
+
+        } catch (IOException | JSONException ex) {
+            System.out.println(ex.getMessage());
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {         
+            System.out.println(ex.getMessage());
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        List<String> listPhone = userRepositoryImpl.checkUserUsingApp(array.toList());
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), listPhone, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    }
 }

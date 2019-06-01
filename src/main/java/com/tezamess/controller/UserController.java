@@ -58,6 +58,11 @@ public class UserController implements ErrorController {
     public ResponseEntity<Object> findUserByPhone(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.findUserByPhone(token, json);
     }
+    
+    @PostMapping("tezamess/api/user-using-app")
+    public ResponseEntity<Object> userUsingApp(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
+        return userServiceImpl.userUsingApp(token, json);
+    }
 
     @PutMapping("tezamess/api/update-user")
     public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {

@@ -102,23 +102,21 @@ public class UserValidator {
 
     }
 
-    public String validatePhoneUser(UserModel userModel) {
+    public String validatePhoneUser(String phone) {
         Pattern pattern = Pattern.compile(REGEX_PHONE);
 
         //kiem tra input data khac null
-        if (userModel.getPhone() == null) {
+        if (phone == null) {
             return environment.getProperty("errer.null");
         }
 
-        userModel.setPhone(userModel.getPhone().trim());
-
         //kiem tra khac rong
-        if (userModel.getPhone().isEmpty()) {
+        if (phone.isEmpty()) {
             return environment.getProperty("errer.isempty");
         }
 
         //kiem tra dinh dang phone
-        if (!pattern.matcher(userModel.getPhone().trim()).matches()) {
+        if (!pattern.matcher(phone).matches()) {
             return environment.getProperty("errer.phoneinvalid");
         }
 

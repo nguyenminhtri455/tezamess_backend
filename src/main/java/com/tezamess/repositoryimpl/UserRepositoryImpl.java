@@ -110,4 +110,16 @@ public class UserRepositoryImpl implements UserRepository {
         return null;
     }
 
+    @Override
+    public List<String> checkUserUsingApp(List<Object> listPhone) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("SELECT u.phone FROM UserModel as u WHERE u.phone IN :phones");
+        query.setParameterList("phones", listPhone);
+        List<String> phones = query.getResultList();
+        if (phones != null && phones.size() > 0) {
+            return phones;
+        }
+        return null;
+    }
+
 }
