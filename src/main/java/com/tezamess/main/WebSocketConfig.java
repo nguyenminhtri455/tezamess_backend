@@ -1,4 +1,3 @@
-
 package com.tezamess.main;
 
 import com.tezamess.component.HttpHandshakeInterceptor;
@@ -11,11 +10,11 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
-    
+public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
     @Autowired
     private HttpHandshakeInterceptor handshakeInterceptor;
-    
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/topic");
@@ -24,10 +23,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-         registry.addEndpoint("/ws").setAllowedOrigins("*").addInterceptors(handshakeInterceptor).withSockJS();
-         
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*")
+                .addInterceptors(handshakeInterceptor).withSockJS();
+        registry.addEndpoint("/ws")
+                .setAllowedOrigins("*")
+                .addInterceptors(handshakeInterceptor);
+
     }
-    
-    
-    
 }

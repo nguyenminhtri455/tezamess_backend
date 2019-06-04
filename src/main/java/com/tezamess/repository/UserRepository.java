@@ -28,6 +28,5 @@ public interface UserRepository {
 
     Boolean userExists(UserModel user);
 
-    List<Object[]> checkUserUsingApp(List<Object> listUser);
-
+    List<Object[]> checkUserUsingApp(int id, List<Object> listUser);
 }

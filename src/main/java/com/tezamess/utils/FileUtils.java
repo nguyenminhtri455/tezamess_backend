@@ -10,22 +10,41 @@ public class FileUtils {
 //    private final String path = "http://192.168.0.104:8080/profile/";
 //    private final String path = "http://172.16.26.173:8080/profile/";
 //    private final String root = "/tezamess/src/main/resources/static/profile";
-    
+
     private final String path = "http://tezamess-tezamess.7e14.starter-us-west-2.openshiftapps.com/profile/";
     private final String root = "/home/jboss/profile";
 
-    public String uploadAvatar(String valueBase64, String name) {
-        byte[] value = Base64.getDecoder().decode(valueBase64);
-      
+    public String uploadAvatar(String valueBase64, String name, String phone) {
+
         File file = new File(root);
         if (!file.exists()) {
             file.mkdirs();
         }
+        int size = file.listFiles().length;
+        for (int i = 0; i < size; i++) {
+            File f = file.listFiles()[i];
+            if (f.getName().lastIndexOf(phone) != -1) {
+                String[] nm = f.getName().split("\\.");
+                if(nm[0].length() - nm[0].lastIndexOf(phone) == 10){
+                    f.delete();
+                }             
+                break;
+            }
+        }
+
+        byte[] value = Base64.getDecoder().decode(valueBase64);
         try (FileOutputStream fileOutputStream = new FileOutputStream(new File(root + File.separator + name))) {
             fileOutputStream.write(value);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return path + name;
+    }
+
+    public void deleteAvatar(String path) {
+        File file = new File(path);
+        if (file.exists()) {
+            file.delete();
+        }
     }
 }

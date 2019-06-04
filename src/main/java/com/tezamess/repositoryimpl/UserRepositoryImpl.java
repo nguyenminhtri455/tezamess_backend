@@ -109,15 +109,21 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<Object[]> checkUserUsingApp(List<Object> listPhone) {
+    public List<Object[]> checkUserUsingApp(int id, List<Object> listPhone) {
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("SELECT u.phone, u.name, u.urlavatar FROM UserModel as u WHERE u.phone IN :phones");
+        Query query = session.createSQLQuery(
+                "SELECT m.id as mid, m.phone as mphone, m.name as mname, m.urlavatar as murl, f.id as fid "
+                + "FROM (SELECT u.id, u.phone, u.name, u.urlavatar FROM member as u "
+                + "WHERE u.phone IN :phones) as m LEFT JOIN friend as f "
+                + "ON (f.useridrequest = :id AND f.useridfriend = m.id) "
+                + "OR (f.useridfriend = :id AND f.useridrequest = m.id)"
+        );
         query.setParameterList("phones", listPhone);
+        query.setParameter("id", id);
         List<Object[]> users = query.getResultList();
         if (users != null && users.size() > 0) {
             return users;
         }
         return null;
     }
-
 }
