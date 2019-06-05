@@ -20,12 +20,12 @@ public class FriendModel implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "useridrequest")
     private UserModel useridrequest;
 
     @JoinColumn(name = "useridfriend")
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private UserModel useridfriend;
 
     public FriendModel() {

@@ -2,19 +2,52 @@ package com.tezamess.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(name = "member")
 public class UserModel implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid", fetch = FetchType.LAZY)
+    private List<CommentModel> commentList;
+
+    @JoinTable(name = "likestatus", joinColumns = {
+        @JoinColumn(name = "userid", referencedColumnName = "id")}, inverseJoinColumns = {
+        @JoinColumn(name = "statusid", referencedColumnName = "id")})
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<StatusModel> statusList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userModel", fetch = FetchType.LAZY)
+    private List<StatusModel> statusList1;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid", fetch = FetchType.LAZY)
+    private List<MessageModel> messageList;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY)
+    private List<RoomModel> roomModelList1;
+
+    @JoinTable(name = "participation",
+            joinColumns = {
+                @JoinColumn(name = "userid", referencedColumnName = "id")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "groupid", referencedColumnName = "id")})
+    @ManyToMany
+    private List<RoomModel> roomModelList;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,7 +79,6 @@ public class UserModel implements Serializable {
     @Column(name = "lastactive")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastactive;
-
 
     public UserModel() {
 
@@ -143,5 +175,56 @@ public class UserModel implements Serializable {
     @Override
     public String toString() {
         return "com.appchat.model.UserModel[ id=" + id + " ]";
+    }
+
+    public List<RoomModel> getRoomModelList() {
+        return roomModelList;
+    }
+
+    public void setRoomModelList(List<RoomModel> roomModelList) {
+        this.roomModelList = roomModelList;
+    }
+
+    @XmlTransient
+    public List<MessageModel> getMessageList() {
+        return messageList;
+    }
+
+    public void setMessageList(List<MessageModel> messageList) {
+        this.messageList = messageList;
+    }
+
+    @XmlTransient
+    public List<RoomModel> getRoomModelList1() {
+        return roomModelList1;
+    }
+
+    public void setRoomModelList1(List<RoomModel> roomModelList1) {
+        this.roomModelList1 = roomModelList1;
+    }
+
+    public List<StatusModel> getStatusList() {
+        return statusList;
+    }
+
+    public void setStatusList(List<StatusModel> statusList) {
+        this.statusList = statusList;
+    }
+
+    public List<StatusModel> getStatusList1() {
+        return statusList1;
+    }
+
+    public void setStatusList1(List<StatusModel> statusList1) {
+        this.statusList1 = statusList1;
+    }
+
+    @XmlTransient
+    public List<CommentModel> getCommentList() {
+        return commentList;
+    }
+
+    public void setCommentList(List<CommentModel> commentList) {
+        this.commentList = commentList;
     }
 }

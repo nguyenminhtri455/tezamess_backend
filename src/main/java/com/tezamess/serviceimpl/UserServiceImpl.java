@@ -268,12 +268,14 @@ public class UserServiceImpl implements UserService {
         }
 
         String phoneFromToken = jwtService.getPhoneFromToken(token);
-        
-        if(phoneFromToken == null){
+        if (phoneFromToken == null) {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_ACCESS_DENIED.getStatus(), null, environment.getProperty("error.denied"), new Date()), HttpStatus.BAD_REQUEST);
         }
-        
+
         UserModel findUserByPhone = userRepositoryImpl.findUserByPhone(phoneFromToken);
+        if (findUserByPhone == null) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_ACCESS_DENIED.getStatus(), null, environment.getProperty("error.denied"), new Date()), HttpStatus.BAD_REQUEST);
+        }
 
         List<Object[]> listUserModel = userRepositoryImpl.checkUserUsingApp(findUserByPhone.getId(), array.toList());
         if (listUserModel == null) {

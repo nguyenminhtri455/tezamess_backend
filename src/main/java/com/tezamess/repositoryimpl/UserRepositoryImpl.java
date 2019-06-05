@@ -118,6 +118,13 @@ public class UserRepositoryImpl implements UserRepository {
                 + "ON (f.useridrequest = :id AND f.useridfriend = m.id) "
                 + "OR (f.useridfriend = :id AND f.useridrequest = m.id)"
         );
+//        Query query = session.createQuery(
+//                "SELECT m.id, m.phone, m.name, m.urlavatar, f.id "
+//                + "FROM (SELECT u.id, u.phone, u.name, u.urlavatar FROM UserModel as u "
+//                + "WHERE u.phone IN :phones) as m LEFT JOIN FriendModel as f "
+//                + "WHERE (f.useridrequest.id = :id AND f.useridfriend.id = m.id) "
+//                + "OR (f.useridfriend.id = :id AND f.useridrequest.id = m.id)"
+//        );
         query.setParameterList("phones", listPhone);
         query.setParameter("id", id);
         List<Object[]> users = query.getResultList();
