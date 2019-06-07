@@ -1,5 +1,5 @@
-package com.tezamess.repository;
-
-public interface CommentRepository {
-    
-}
+//package com.tezamess.repository;
+//
+//public interface CommentRepository {
+//    
+//}

@@ -1,8 +1,7 @@
 package com.tezamess.model;
 
 import java.io.Serializable;
-import java.util.List;
-import javax.persistence.Basic;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,32 +14,26 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(name = "room")
 public class RoomModel implements Serializable {
 
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 50)
-    @Column(name = "name")
-    private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "groupid", fetch = FetchType.LAZY)
-    private List<MessageModel> messageList;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "groupid", fetch = FetchType.EAGER)
+    private Set<MessageModel> messageList;
 
-    @ManyToMany(mappedBy = "roomModelList")
-    private List<UserModel> userModelList;
+    @ManyToMany(mappedBy = "roomModelList",fetch = FetchType.EAGER)
+    private Set<UserModel> userModelList;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
+    @Column(name = "name")
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "creator", referencedColumnName = "id")
     private UserModel creator;
 
@@ -77,11 +70,11 @@ public class RoomModel implements Serializable {
         return "com.tezamess.model.Room[ id=" + id + " ]";
     }
 
-    public List<UserModel> getUserModelList() {
+    public Set<UserModel> getUserModelList() {
         return userModelList;
     }
 
-    public void setUserModelList(List<UserModel> userModelList) {
+    public void setUserModelList(Set<UserModel> userModelList) {
         this.userModelList = userModelList;
     }
 
@@ -93,12 +86,11 @@ public class RoomModel implements Serializable {
         this.name = name;
     }
 
-    @XmlTransient
-    public List<MessageModel> getMessageList() {
+    public Set<MessageModel> getMessageList() {
         return messageList;
     }
 
-    public void setMessageList(List<MessageModel> messageList) {
+    public void setMessageList(Set<MessageModel> messageList) {
         this.messageList = messageList;
     }
 

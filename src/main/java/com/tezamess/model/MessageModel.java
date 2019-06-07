@@ -33,11 +33,11 @@ public class MessageModel implements Serializable {
     @Column(name = "body")
     private String body;
 
-    @JoinColumn(name = "groupid", referencedColumnName = "id")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "groupid")
+    @ManyToOne(fetch = FetchType.EAGER)
     private RoomModel groupid;
 
-    @JoinColumn(name = "userid", referencedColumnName = "id")
+    @JoinColumn(name = "userid")
     @ManyToOne(fetch = FetchType.LAZY)
     private UserModel userid;
 

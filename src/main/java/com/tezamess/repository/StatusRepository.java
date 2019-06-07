@@ -1,5 +1,5 @@
-package com.tezamess.repository;
-
-public interface StatusRepository {
-    
-}
+//package com.tezamess.repository;
+//
+//public interface StatusRepository {
+//    
+//}

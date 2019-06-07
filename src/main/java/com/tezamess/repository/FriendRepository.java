@@ -1,5 +1,5 @@
-package com.tezamess.repository;
-
-public interface FriendRepository {
-    
-}
+//package com.tezamess.repository;
+//
+//public interface FriendRepository {
+//    
+//}
