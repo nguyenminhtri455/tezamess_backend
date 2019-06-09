@@ -1,6 +1,7 @@
 package com.tezamess.model;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -19,11 +21,16 @@ import javax.persistence.Table;
 @Table(name = "room")
 public class RoomModel implements Serializable {
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "groupid", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "groupid", fetch = FetchType.LAZY)
     private Set<MessageModel> messageList;
 
-    @ManyToMany(mappedBy = "roomModelList",fetch = FetchType.EAGER)
-    private Set<UserModel> userModelList;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "participation",
+            joinColumns = {
+                @JoinColumn(name = "groupid")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "userid")})
+    private Set<UserModel> userModelList = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,9 +40,13 @@ public class RoomModel implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator", referencedColumnName = "id")
     private UserModel creator;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type", referencedColumnName = "id")
+    private TypeRoomModel typeRoomModel;
 
     public RoomModel() {
     }
@@ -92,6 +103,14 @@ public class RoomModel implements Serializable {
 
     public void setMessageList(Set<MessageModel> messageList) {
         this.messageList = messageList;
+    }
+
+    public TypeRoomModel getTypeRoomModel() {
+        return typeRoomModel;
+    }
+
+    public void setTypeRoomModel(TypeRoomModel typeRoomModel) {
+        this.typeRoomModel = typeRoomModel;
     }
 
 }

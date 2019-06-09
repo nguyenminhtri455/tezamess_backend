@@ -8,6 +8,7 @@ import com.tezamess.model.WelcomeModel;
 import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
@@ -34,7 +35,7 @@ public class UserController implements ErrorController {
 
     @GetMapping("tezamess/api-users")
     public ResponseEntity<Object> getAll() {
-        List<UserModel> list = userServiceImpl.findAll();
+        List<Map<String, Object>> list = userServiceImpl.findAll();
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), list, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 

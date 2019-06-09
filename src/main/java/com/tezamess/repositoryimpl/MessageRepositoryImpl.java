@@ -16,9 +16,8 @@ public class MessageRepositoryImpl implements MessageRepository {
     SessionFactory sessionFactory;
 
     @Override
-    public MessageModel saveMessage(MessageModel message) {
+    public void saveMessage(MessageModel message) {
         Session ss = sessionFactory.getCurrentSession();
         ss.save(message);
-        return message;
     }
 }

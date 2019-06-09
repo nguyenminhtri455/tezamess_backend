@@ -7,6 +7,7 @@ import com.tezamess.service.JwtService;
 import com.tezamess.service.UserService;
 import com.tezamess.validator.UserValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
 import com.tezamess.utils.FileUtils;
@@ -49,10 +50,20 @@ public class UserServiceImpl implements UserService {
     private FileUtils fileUtils;
 
     @Override
-    public List<UserModel> findAll() {
+    public List<Map<String, Object>> findAll() {
         List<UserModel> list = userRepositoryImpl.findAll();
-        list.stream().forEach(t -> t.setPassword(new String(Base64.getDecoder().decode(t.getPassword()))));
-        return list;
+
+        if (list != null) {
+            List<Map<String, Object>> l = new ArrayList<>();
+            list.stream().forEach(t -> {
+                t.setPassword(new String(Base64.getDecoder().decode(t.getPassword())));
+                Map<String, Object> convertToMap = MappedUserModel.convertToMap(t);
+                l.add(convertToMap);
+            });
+            list.clear();
+            return l;
+        }
+        return null;
     }
 
     @Override

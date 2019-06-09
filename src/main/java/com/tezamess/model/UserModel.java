@@ -2,6 +2,7 @@ package com.tezamess.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -39,14 +40,13 @@ public class UserModel implements Serializable {
 //
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY)
 //    private List<RoomModel> roomModelList1;
-
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "participation",
             joinColumns = {
-                @JoinColumn(name = "userid", referencedColumnName = "id")},
+                @JoinColumn(name = "userid")},
             inverseJoinColumns = {
-                @JoinColumn(name = "groupid", referencedColumnName = "id")})
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<RoomModel> roomModelList;
+                @JoinColumn(name = "groupid")})
+    private Set<RoomModel> roomModelList = new HashSet<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

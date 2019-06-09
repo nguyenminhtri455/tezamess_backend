@@ -2,11 +2,12 @@ package com.tezamess.service;
 
 import com.tezamess.model.UserModel;
 import java.util.List;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 
 public interface UserService {
 
-    List<UserModel> findAll();
+    List<Map<String, Object>> findAll();
 
     ResponseEntity<Object> login(String json);
 

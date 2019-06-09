@@ -20,7 +20,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/room","/topic");
-        registry.setApplicationDestinationPrefixes("/send","/app");
+        registry.setApplicationDestinationPrefixes("/chat","/app");
     }
 
     @Override
@@ -28,8 +28,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/tezamess","/ws")
                 .setAllowedOrigins("*")
                 .addInterceptors(handshakeInterceptor).withSockJS();
-        registry.addEndpoint("/tezamess","/ws")
-                .setAllowedOrigins("*")
-                .addInterceptors(handshakeInterceptor);
+//        registry.addEndpoint("/tezamess","/ws")
+//                .setAllowedOrigins("*")
+//                .addInterceptors(handshakeInterceptor);
     }
 }
