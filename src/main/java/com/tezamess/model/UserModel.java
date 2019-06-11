@@ -183,6 +183,8 @@ public class UserModel implements Serializable {
     public void setRoomModelList(Set<RoomModel> roomModelList) {
         this.roomModelList = roomModelList;
     }
+    
+   
 
 //    public Set<MessageModel> getMessageList() {
 //        return messageList;

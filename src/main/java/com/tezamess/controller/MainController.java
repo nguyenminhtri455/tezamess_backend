@@ -2,8 +2,8 @@ package com.tezamess.controller;
 
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
-import com.tezamess.model.UserModel;
 import com.tezamess.model.WelcomeModel;
+import com.tezamess.serviceimpl.FriendServiceImpl;
 
 import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
@@ -23,10 +23,13 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class UserController implements ErrorController {
+public class MainController implements ErrorController {
 
     @Autowired
     private UserServiceImpl userServiceImpl;
+    
+    @Autowired
+    private FriendServiceImpl friendServiceImpl;
 
     @GetMapping(value = {"/", "/tezamess"})
     public ResponseEntity<Object> welcome() {
@@ -46,6 +49,7 @@ public class UserController implements ErrorController {
 
     @PostMapping("tezamess/api-login")
     public ResponseEntity<Object> login(@RequestBody(required = false) String json) {
+        System.out.println(json);
         return userServiceImpl.login(json);
     }
 
@@ -61,13 +65,18 @@ public class UserController implements ErrorController {
     }
     
     @PostMapping("tezamess/api/user-using-app")
-    public ResponseEntity<Object> userUsingApp(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
+    public ResponseEntity<Object> usersUsingApp(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.userUsingApp(token, json);
     }
 
     @PutMapping("tezamess/api/update-user")
     public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.updateUser(token, json);
+    }
+    
+    @PostMapping("tezamess/api/get-friends")
+    public ResponseEntity<Object> getFriends(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
+        return friendServiceImpl.getFriends(json);
     }
 
     @GetMapping("/error")

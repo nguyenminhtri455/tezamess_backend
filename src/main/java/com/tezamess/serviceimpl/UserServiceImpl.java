@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
         HttpHeaders httpHeaders = new HttpHeaders();
         String token = jwtService.generateTokenLogin(userResponse.getPhone());
         httpHeaders.add("token", token);
-        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), userResponse, Status.SUCCESS.name(), new Date()));
+        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userResponse), Status.SUCCESS.name(), new Date()));
     }
 
     @Override
@@ -142,7 +142,7 @@ public class UserServiceImpl implements UserService {
         HttpHeaders httpHeaders = new HttpHeaders();
         String token = jwtService.generateTokenLogin(userModel.getPhone());
         httpHeaders.add("token", token);
-        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()));
+        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()));
 
     }
 
@@ -204,7 +204,7 @@ public class UserServiceImpl implements UserService {
         if (userModel == null) {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
 
     }
 
@@ -241,7 +241,7 @@ public class UserServiceImpl implements UserService {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
         }
         userModel.setPassword(null);
-        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), userModel, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 
     @Override
@@ -249,7 +249,7 @@ public class UserServiceImpl implements UserService {
         UserModel user = userRepositoryImpl.findUserById(id);
         if (user != null) {
             user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
-            return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), user, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+            return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(user), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.unexists"), new Date()), HttpStatus.BAD_REQUEST);
     }
@@ -296,17 +296,14 @@ public class UserServiceImpl implements UserService {
         List<Map<String, Object>> list = new ArrayList<>();
         listUserModel
                 .stream()
+                .filter(t -> t[4] == null)
                 .forEach(t -> {
                     Map<String, Object> map = new HashMap();
                     map.put("id", t[0]);
                     map.put("phone", t[1]);
                     map.put("name", t[2]);
                     map.put("urlavatar", t[3]);
-                    if (t[4] != null) {
-                        map.put("relationship", true);
-                    } else {
-                        map.put("relationship", false);
-                    }
+                    map.put("relationship", false);
                     list.add(map);
                 });
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), list, Status.SUCCESS.name(), new Date()), HttpStatus.OK);

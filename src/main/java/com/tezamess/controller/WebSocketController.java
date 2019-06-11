@@ -46,9 +46,9 @@ public class WebSocketController {
 
     @MessageMapping("/chat.sendMessage/{roomId}")
     @SendTo("/room/{roomId}")
-    public MessageModel sendMessage(@Payload MessageModel message, @DestinationVariable String roomId) {
-        System.out.println(message.getBody());
-        messageServiceImpl.saveMessage(message);
+    public ChatMessage sendMessage(@Payload ChatMessage message, @DestinationVariable String roomId) {
+        System.out.println(message.getContent());
+//        messageServiceImpl.saveMessage(message);
         return message;
     }
 

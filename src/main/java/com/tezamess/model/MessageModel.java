@@ -35,11 +35,11 @@ public class MessageModel implements Serializable {
 
     @JoinColumn(name = "groupid")
     @ManyToOne(fetch = FetchType.EAGER)
-    private RoomModel groupid;
+    private RoomModel group;
 
     @JoinColumn(name = "userid")
     @ManyToOne(fetch = FetchType.EAGER)
-    private UserModel userid;
+    private UserModel user;
 
     public MessageModel() {
     }
@@ -79,19 +79,19 @@ public class MessageModel implements Serializable {
     }
 
     public RoomModel getGroupid() {
-        return groupid;
+        return group;
     }
 
-    public void setGroupid(RoomModel groupid) {
-        this.groupid = groupid;
+    public void setGroupid(RoomModel group) {
+        this.group = group;
     }
 
     public UserModel getUserid() {
-        return userid;
+        return user;
     }
 
-    public void setUserid(UserModel userid) {
-        this.userid = userid;
+    public void setUserid(UserModel user) {
+        this.user = user;
     }
 
     @Override
