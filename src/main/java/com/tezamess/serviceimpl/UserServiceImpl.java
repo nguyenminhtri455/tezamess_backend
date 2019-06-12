@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
         HttpHeaders httpHeaders = new HttpHeaders();
         String token = jwtService.generateTokenLogin(userResponse.getPhone());
         httpHeaders.add("token", token);
-        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userResponse), Status.SUCCESS.name(), new Date()));
+        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMapWithRooms(userResponse), Status.SUCCESS.name(), new Date()));
     }
 
     @Override

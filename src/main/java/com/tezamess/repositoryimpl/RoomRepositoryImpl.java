@@ -38,7 +38,7 @@ public class RoomRepositoryImpl implements RoomRepository {
         }
         if (idCreateUser != -1) {
 //            UserModel get = session.get(UserModel.class, idCreateUser);
-            
+
             room.setCreator(new UserModel(idCreateUser));
         }
 
@@ -72,9 +72,6 @@ public class RoomRepositoryImpl implements RoomRepository {
     public RoomModel findRoom(int id) {
         Session session = sessionFactory.getCurrentSession();
         RoomModel room = session.get(RoomModel.class, id);
-        if (room != null) {
-            return room;
-        }
-        return null;
+        return room;
     }
 }

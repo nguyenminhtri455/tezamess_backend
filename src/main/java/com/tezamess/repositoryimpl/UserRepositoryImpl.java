@@ -36,6 +36,7 @@ public class UserRepositoryImpl implements UserRepository {
         query.setParameter("password", userModel.getPassword());
         List<UserModel> resultList = query.getResultList();
         if (resultList.size() > 0) {
+            resultList.get(0).getRoomModelList().size();
             return resultList.get(0);
         }
         return null;
@@ -53,8 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
             return null;
         }
         Session session = sessionFactory.getCurrentSession();
-        Serializable save = session.save(userModel);
-        System.out.println(save.toString());
+        session.save(userModel);
         return userModel;
     }
 

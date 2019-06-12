@@ -24,7 +24,7 @@ public class RoomModel implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "group", fetch = FetchType.LAZY)
     private Set<MessageModel> messageList;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "participation",
             joinColumns = {
                 @JoinColumn(name = "groupid")},

@@ -17,12 +17,11 @@ public class RoomServiceImpl implements RoomService {
     @Override
     public RoomModel createRoom(String json) {
         JSONObject jSONObject = new JSONObject(json);
-
         JSONArray jsonArray = jSONObject.getJSONArray("ids");
         RoomModel room = roomRepositoryImpl.
                 createRoom(jSONObject.getString("name"),
-                         Integer.parseInt(jSONObject.getString("idCreateUser")),
-                         new int[]{jsonArray.getInt(0)});
+                        jSONObject.getInt("idCreateUser"),
+                        new int[]{jsonArray.getInt(0)});
         return room;
     }
 
