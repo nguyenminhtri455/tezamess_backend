@@ -1,9 +1,12 @@
 package com.tezamess.controller;
 
+import com.tezamess.map.MappedRoomModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
+import com.tezamess.model.RoomModel;
 import com.tezamess.model.WelcomeModel;
 import com.tezamess.serviceimpl.FriendServiceImpl;
+import com.tezamess.serviceimpl.RoomServiceImpl;
 
 import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
@@ -28,6 +31,9 @@ public class MainController implements ErrorController {
     @Autowired
     private UserServiceImpl userServiceImpl;
     
+    @Autowired
+    private RoomServiceImpl roomServiceImpl;
+
     @Autowired
     private FriendServiceImpl friendServiceImpl;
 
@@ -63,7 +69,7 @@ public class MainController implements ErrorController {
     public ResponseEntity<Object> findUserByPhone(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.findUserByPhone(token, json);
     }
-    
+
     @PostMapping("tezamess/api/user-using-app")
     public ResponseEntity<Object> usersUsingApp(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.userUsingApp(token, json);
@@ -73,10 +79,17 @@ public class MainController implements ErrorController {
     public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.updateUser(token, json);
     }
-    
+
     @PostMapping("tezamess/api/get-friends")
     public ResponseEntity<Object> getFriends(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return friendServiceImpl.getFriends(json);
+    }
+
+    @GetMapping("/tezamess/api-test")
+    public ResponseEntity<Object> testAPI(String json) {
+        RoomModel room = roomServiceImpl.findOrCreateRoom(null);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedRoomModel.convertToMap(room), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+
     }
 
     @GetMapping("/error")

@@ -2,6 +2,7 @@ package com.tezamess.controller;
 
 import com.tezamess.map.MappedRoomModel;
 import com.tezamess.model.ChatMessage;
+import com.tezamess.model.MessageModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
@@ -36,25 +37,28 @@ public class WebSocketController {
     public void createRoom(@Payload String json) {
         System.out.println(json);
 
-        RoomModel room = roomServiceImpl.createRoom(json);
-
-        Set<UserModel> listUser = room.getUserModelList();
-        listUser.stream().forEach(t -> {
-            System.out.println(t.getId() + "----id");
-            sendingOperations.convertAndSend("/room/user/" + t.getId()
-                    ,new ResultModelV2(ResultModelV2.Status.CREATE_ROOM.getStatus()
-                            , MappedRoomModel.convertToMap(room)
-                            , ResultModelV2.Status.CREATE_ROOM.name()
-                            , new Date()) );
-        });
+        RoomModel room = roomServiceImpl.findOrCreateRoom(json);
+        if (room != null) {
+            Set<UserModel> listUser = room.getUserModelList();
+            listUser.stream().forEach(t -> {
+                System.out.println(t.getId() + "----id nhan duoc thong bao tao room");
+                sendingOperations.convertAndSend("/room/user/" + t.getId(),
+                        new ResultModelV2(ResultModelV2.Status.CREATE_ROOM.getStatus(),
+                                MappedRoomModel.convertToMap(room),
+                                ResultModelV2.Status.CREATE_ROOM.name(),
+                                new Date()));
+            });
+        } else {
+            System.out.println("loi !!!!!");
+        }
 
     }
 
     //gui tin nhan den phong chat
     @MessageMapping("/chat.sendMessage/{roomId}")
     @SendTo("/room/{roomId}")
-    public ChatMessage sendMessage(@Payload ChatMessage message, @DestinationVariable String roomId) {
-        System.out.println(message.getContent());
+    public String sendMessage(@Payload String message, @DestinationVariable String roomId) {
+        System.out.println(message);
 //        messageServiceImpl.saveMessage(message);
         return message;
     }
@@ -64,11 +68,19 @@ public class WebSocketController {
     public void addfriend(@Payload String json) {
         System.out.println(json);
         JSONObject jSONObject = new JSONObject(json);
-        sendingOperations.convertAndSend("/room/user/" + jSONObject.getInt("idfriend")
-                , new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus()
-                            , json
-                            , ResultModelV2.Status.ADD_FRIEND_REQUEST.name()
-                            , new Date()));
+        int id = jSONObject.getInt("idRequest");
+        int idfriend = jSONObject.getInt("idFriend");
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus(),
+                        new JSONObject(json).toString(),
+                        ResultModelV2.Status.ADD_FRIEND_REQUEST.name(),
+                        new Date()));
+
+        sendingOperations.convertAndSend("/room/user/" + idfriend,
+                new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus(),
+                        new JSONObject(json).toString(),
+                        ResultModelV2.Status.ADD_FRIEND_REQUEST.name(),
+                        new Date()));
     }
 
     @MessageMapping("/notify.user/{userId}")

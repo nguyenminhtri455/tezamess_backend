@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -24,11 +26,10 @@ public class RoomRepositoryImpl implements RoomRepository {
     SessionFactory sessionFactory;
 
     @Override
-    public RoomModel createRoom(String name, int idCreateUser, int... ids) {
+    public RoomModel createRoom(String name, int idCreateUser, List<Integer> listId) {
         Session session = sessionFactory.getCurrentSession();
-
-        RoomModel room = new RoomModel();
-        if (ids.length > 1) {
+        RoomModel room = new RoomModel(); 
+        if (listId.size() > 2) {
             room.setTypeRoomModel(new TypeRoomModel("G"));
         } else {
             room.setTypeRoomModel(new TypeRoomModel("D"));
@@ -45,14 +46,8 @@ public class RoomRepositoryImpl implements RoomRepository {
         session.save(room);
 
         Query query = session.createQuery("From UserModel WHERE id IN :ids", UserModel.class);
-        List<Integer> l = new ArrayList<Integer>();
-        l.add(idCreateUser);
-        for (int i : ids) {
-            l.add(i);
-        }
-
-        query.setParameterList("ids", l);
-
+        
+        query.setParameterList("ids", listId);
         List<UserModel> resultList = query.getResultList();
         Set<UserModel> set = new HashSet<UserModel>(resultList);
         room.setUserModelList(set);
@@ -73,5 +68,38 @@ public class RoomRepositoryImpl implements RoomRepository {
         Session session = sessionFactory.getCurrentSession();
         RoomModel room = session.get(RoomModel.class, id);
         return room;
+    }
+
+    @Override
+    public RoomModel findRoom(List<Integer> listId) {
+        Session session = sessionFactory.getCurrentSession();
+
+        Query query = session.createSQLQuery("SELECT * FROM "
+                + " participation WHERE groupid IN (SELECT DISTINCT p.groupid FROM room,member,participation as p"
+                + " WHERE p.userid = member.id AND p.groupid = room.id AND p.userid IN :ids)"
+                + " GROUP BY groupid"
+                + " HAVING COUNT(*) = :size");
+//        Query query = session.createQuery("FROM RoomModel as d"
+//                + " WHERE d.id IN (SELECT DISTINCT r.id FROM RoomModel r JOIN r.userModelList e"
+//                + " WHERE e.id IN :ids)"
+//                + " GROUP BY d.id", RoomModel.class);
+//        Query query = session.createQuery("FROM RoomModel r JOIN r.userModelList e"
+//                + " WHERE e.id IN :ids"
+//                + " GROUP BY r");
+        query.setParameterList("ids", listId);
+        query.setParameter("size", listId.size());
+
+        List<Object[]> resultList = query.getResultList();
+        for (Object[] o : resultList) {
+            RoomModel room = session.get(RoomModel.class, (int) o[0]);
+            List<Integer> collect = room.getUserModelList().stream()
+                    .map(UserModel::getId)
+                    .collect(Collectors.toList());
+            collect.removeAll(listId);
+            if (collect.size() == 0) {
+                return room;
+            }
+        };
+        return null;
     }
 }

@@ -268,6 +268,9 @@ public class UserServiceImpl implements UserService {
                 throw new IOException();
             }
             array = new JSONArray(json);
+            if(array.length() == 0){
+                return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), null, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+            }
 
         } catch (IOException | JSONException ex) {
             System.out.println(ex.getMessage());
