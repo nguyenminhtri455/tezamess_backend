@@ -17,7 +17,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -30,8 +30,8 @@ public class WebSocketController {
     private MessageServiceImpl messageServiceImpl;
 
     @Autowired
-    private SimpMessageSendingOperations sendingOperations;
-
+    private SimpMessagingTemplate sendingOperations;
+    
     //tao phong chat
     @MessageMapping("/room.create")
     public void createRoom(@Payload String json) {
@@ -47,6 +47,7 @@ public class WebSocketController {
                                 MappedRoomModel.convertToMap(room),
                                 ResultModelV2.Status.CREATE_ROOM.name(),
                                 new Date()));
+            
             });
         } else {
             System.out.println("loi !!!!!");
@@ -92,12 +93,14 @@ public class WebSocketController {
 
     @MessageMapping("/chat.joinRoom/{roomId}")
     @SendTo("/room/{roomId}")
-    public ChatMessage joinRoom(@Payload ChatMessage chatMessage, @DestinationVariable String roomId,
+    public String joinRoom(@Payload String messageOnline, @DestinationVariable String roomId,
             SimpMessageHeaderAccessor headerAccessor) {
         // Add username in web socket session     
-        System.out.println(chatMessage.getSender());
-        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-        return chatMessage;
+        System.out.println(messageOnline);
+        JSONObject jSONObject = new JSONObject(messageOnline);
+        headerAccessor.getSessionAttributes().put("username", String.valueOf(jSONObject.getInt("user")));
+          headerAccessor.getSessionAttributes().put("group", String.valueOf(jSONObject.getInt("group")));
+        return messageOnline;
     }
 
     @MessageMapping("/chat.leaveRoom/{roomId}")

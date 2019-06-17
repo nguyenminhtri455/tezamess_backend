@@ -1,20 +1,15 @@
 package com.tezamess.serviceimpl;
 
-import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
-import com.tezamess.model.UserModel;
 import com.tezamess.repositoryimpl.RoomRepositoryImpl;
 import com.tezamess.service.RoomService;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
