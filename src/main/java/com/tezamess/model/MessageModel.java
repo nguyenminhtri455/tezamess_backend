@@ -2,6 +2,9 @@ package com.tezamess.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,35 +13,38 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(name = "message")
 public class MessageModel implements Serializable {
+
+    @Column(name = "createdate")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdate;
+ 
+    @Size(min = 1, max = 500)
+    @Column(name = "body")
+    private String body;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Integer id;
 
-    @NotNull
-    @Column(name = "createdate")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date createdate;
-
-    @NotNull
-    @Column(name = "body")
-    private String body;
 
     @JoinColumn(name = "groupid")
-    @ManyToOne(fetch = FetchType.EAGER)
-    private RoomModel group;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RoomModel room;
 
     @JoinColumn(name = "userid")
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     private UserModel user;
 
     public MessageModel() {
@@ -62,28 +68,13 @@ public class MessageModel implements Serializable {
         this.id = id;
     }
 
-    public Date getCreatedate() {
-        return createdate;
+
+    public RoomModel getRoomid() {
+        return room;
     }
 
-    public void setCreatedate(Date createdate) {
-        this.createdate = createdate;
-    }
-
-    public String getBody() {
-        return body;
-    }
-
-    public void setBody(String body) {
-        this.body = body;
-    }
-
-    public RoomModel getGroupid() {
-        return group;
-    }
-
-    public void setGroupid(RoomModel group) {
-        this.group = group;
+    public void setRoomid(RoomModel room) {
+        this.room = room;
     }
 
     public UserModel getUserid() {
@@ -99,4 +90,38 @@ public class MessageModel implements Serializable {
         return "com.tezamess.model.Message[ id=" + id + " ]";
     }
 
+    @Override
+    public boolean equals(Object obj) {
+         if (obj == null) {
+            return false;
+        }
+
+        if (!(obj instanceof MessageModel)) {
+            return false;
+        }
+
+        MessageModel messageModel = (MessageModel) obj;
+        if (this.id == messageModel.getId()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public Date getCreatedate() {
+        return createdate;
+    }
+
+    public void setCreatedate(Date createdate) {
+        this.createdate = createdate;
+    }
+
+    public String getBody() {
+        return body;
+    }
+
+    public void setBody(String body) {
+        this.body = body;
+    }
+    
 }

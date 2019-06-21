@@ -1,11 +1,16 @@
 package com.tezamess.repositoryimpl;
 
+import com.tezamess.model.MessageModel;
+import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.repository.UserRepository;
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -36,7 +41,15 @@ public class UserRepositoryImpl implements UserRepository {
         query.setParameter("password", userModel.getPassword());
         List<UserModel> resultList = query.getResultList();
         if (resultList.size() > 0) {
-            resultList.get(0).getRoomModelList().size();
+            int size = resultList.get(0).getRoomModelList().size();
+            for (RoomModel room : resultList.get(0).getRoomModelList()) {
+                Query query1 = session.createQuery("FROM MessageModel as m WHERE m.room.id = :idRoom ORDER BY m.id DESC");
+                query1.setFirstResult(0);
+                query1.setMaxResults(100);
+                query1.setParameter("idRoom", room.getId());
+                List<MessageModel> resultList1 = query1.getResultList();
+                room.setMessageList(new HashSet<>(resultList1));
+            }
             return resultList.get(0);
         }
         return null;
@@ -130,6 +143,17 @@ public class UserRepositoryImpl implements UserRepository {
         List<Object[]> users = query.getResultList();
         if (users != null && users.size() > 0) {
             return users;
+        }
+        return null;
+    }
+
+    @Override
+    public UserModel findUserByIdWithRoom(int id) {
+        Session session = sessionFactory.getCurrentSession();
+        UserModel user = session.get(UserModel.class, id);
+        user.getRoomModelList().size();
+        if (user != null) {
+            return user;
         }
         return null;
     }

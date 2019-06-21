@@ -15,6 +15,8 @@ public interface UserRepository {
 
     UserModel findUserById(int id);
 
+    UserModel findUserByIdWithRoom(int id);
+
     UserModel findUserByPhone(String phone);
 
     Boolean userExists(UserModel user);

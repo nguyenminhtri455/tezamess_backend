@@ -21,7 +21,7 @@ import javax.persistence.Table;
 @Table(name = "room")
 public class RoomModel implements Serializable {
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "group", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", fetch = FetchType.LAZY)
     private Set<MessageModel> messageList;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -112,5 +112,4 @@ public class RoomModel implements Serializable {
     public void setTypeRoomModel(TypeRoomModel typeRoomModel) {
         this.typeRoomModel = typeRoomModel;
     }
-
 }

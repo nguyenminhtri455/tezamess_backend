@@ -1,7 +1,10 @@
 package com.tezamess.service;
 
-import com.tezamess.model.MessageModel;
+import java.util.List;
+import java.util.Map;
+
 
 public interface MessageService {
-    void saveMessage(MessageModel message);
+    String saveMessage(String json);
+    List<Map<String, Object>> getMessageaUnread(int id);
 }

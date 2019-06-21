@@ -1,7 +1,9 @@
 package com.tezamess.repository;
 
 import com.tezamess.model.MessageModel;
+import java.util.List;
 
 public interface MessageRepository {
-    void saveMessage(MessageModel message);
+    MessageModel saveMessage(MessageModel message);
+    List<Object[]> getMessagesUnread(int idUser);
 }

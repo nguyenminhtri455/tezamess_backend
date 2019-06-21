@@ -1,7 +1,9 @@
 package com.tezamess.map;
 
+import com.tezamess.model.MessageModel;
 import com.tezamess.model.UserModel;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,15 +53,27 @@ public class MappedUserModel {
                     m.put("name", t.getName());
                     m.put("type", t.getTypeRoomModel().getId());
                     m.put("size", t.getUserModelList().size());
-                    if (t.getTypeRoomModel().getId().equals("D")) {
-                        List<Map<String, Object>> members = new ArrayList<>();
-                        t.getUserModelList().stream().forEach(s -> {
-                            Map<String, Object> member = convertToMapBy4Record(s);
-                            members.add(member);
-                        });
-                        m.put("members", members);
-                    }
+//                    if (t.getTypeRoomModel().getId().equals("D")) {
+                    //Danh sach thanh vien trong phong
+                    List<Map<String, Object>> members = new ArrayList<>();
+                    t.getUserModelList().stream().forEach(s -> {
+                        Map<String, Object> member = convertToMapBy4Record(s);
+                        members.add(member);
+                    });
+                    m.put("members", members);
+//                    }
                     rooms.add(m);
+
+                    //Danh sach tin nhan trong phong
+                    List<Map<String, Object>> messages = new ArrayList<>();
+                    t.getMessageList().stream().sorted((MessageModel t1, MessageModel t2) -> t1.getId()
+                            .compareTo(t2.getId()))
+                            .forEach(a -> {
+                                System.out.println(a.getId());
+                                Map<String, Object> message = MappedMessageModel.convertMessageChat(a);
+                                messages.add(message);
+                            });
+                    m.put("messages", messages);
                 });
         map.put("rooms", rooms);
         return map;

@@ -2,7 +2,6 @@ package com.tezamess.controller;
 
 import com.tezamess.map.MappedRoomModel;
 import com.tezamess.model.ChatMessage;
-import com.tezamess.model.MessageModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
@@ -31,7 +30,7 @@ public class WebSocketController {
 
     @Autowired
     private SimpMessagingTemplate sendingOperations;
-    
+
     //tao phong chat
     @MessageMapping("/room.create")
     public void createRoom(@Payload String json) {
@@ -47,7 +46,7 @@ public class WebSocketController {
                                 MappedRoomModel.convertToMap(room),
                                 ResultModelV2.Status.CREATE_ROOM.name(),
                                 new Date()));
-            
+
             });
         } else {
             System.out.println("loi !!!!!");
@@ -60,7 +59,15 @@ public class WebSocketController {
     @SendTo("/room/{roomId}")
     public String sendMessage(@Payload String message, @DestinationVariable String roomId) {
         System.out.println(message);
-//        messageServiceImpl.saveMessage(message);
+ 
+        return messageServiceImpl.saveMessage(message);
+    }
+
+    //gui tin nhan den phong chat
+    @MessageMapping("/chat.sendMessageResponse/{roomId}")
+    @SendTo("/room/{roomId}")
+    public String sendMessageResponse(@Payload String message, @DestinationVariable String roomId) {
+        System.out.println(message);
         return message;
     }
 
@@ -73,22 +80,15 @@ public class WebSocketController {
         int idfriend = jSONObject.getInt("idFriend");
         sendingOperations.convertAndSend("/room/user/" + id,
                 new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus(),
-                        new JSONObject(json).toString(),
+                        jSONObject.toString(),
                         ResultModelV2.Status.ADD_FRIEND_REQUEST.name(),
                         new Date()));
 
         sendingOperations.convertAndSend("/room/user/" + idfriend,
                 new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus(),
-                        new JSONObject(json).toString(),
+                        jSONObject.toString(),
                         ResultModelV2.Status.ADD_FRIEND_REQUEST.name(),
                         new Date()));
-    }
-
-    @MessageMapping("/notify.user/{userId}")
-    @SendTo("/room/user/{userId}")
-    public String receiveNotifications(@Payload String json, @DestinationVariable String userId) {
-        System.out.println(json);
-        return null;
     }
 
     @MessageMapping("/chat.joinRoom/{roomId}")
@@ -98,20 +98,17 @@ public class WebSocketController {
         // Add username in web socket session     
         System.out.println(messageOnline);
         JSONObject jSONObject = new JSONObject(messageOnline);
-        headerAccessor.getSessionAttributes().put("username", String.valueOf(jSONObject.getInt("user")));
-          headerAccessor.getSessionAttributes().put("group", String.valueOf(jSONObject.getInt("group")));
+        String type = jSONObject.getString("type");
+        if (!type.equals("Response")) {
+            int id = jSONObject.getInt("user");
+            headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
+//            sendingOperations.convertAndSend("/room/user/" + id,
+//                new ResultModelV2(ResultModelV2.Status.UNREAD_MESSAGE.getStatus(),
+//                        messageServiceImpl.getMessageaUnread(id),
+//                        ResultModelV2.Status.UNREAD_MESSAGE.name(),
+//                        new Date()));
+        }
         return messageOnline;
-    }
-
-    @MessageMapping("/chat.leaveRoom/{roomId}")
-    @SendTo("/room/{roomId}")
-    public ChatMessage leaveRoom(@Payload ChatMessage chatMessage, @DestinationVariable String roomId,
-            SimpMessageHeaderAccessor headerAccessor) {
-        // Add username in web socket session
-
-        System.out.println(chatMessage.getSender());
-        headerAccessor.getSessionAttributes().put("username", chatMessage.getSender());
-        return chatMessage;
     }
 
     //test by Android
