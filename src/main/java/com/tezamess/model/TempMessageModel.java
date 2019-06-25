@@ -27,9 +27,13 @@ public class TempMessageModel implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private UserModel idmember;
 
-    @JoinColumn(name = "idmessage", updatable = false)
+    @JoinColumn(name = "idmessage")
     @ManyToOne(fetch = FetchType.LAZY)
     private MessageModel idmessage;
+    
+    @JoinColumn(name = "roomid", updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RoomModel idRoom;
 
     public TempMessageModel() {
     }
@@ -51,11 +55,7 @@ public class TempMessageModel implements Serializable {
         this.id = id;
     }
 
-    public int getStatusmessage() {
-        return statusMessage;
-    }
-
-    public void setStatusmessage(int statusMessage) {
+    public void setStatusMessage(int statusMessage) {
         this.statusMessage = statusMessage;
     }
 
@@ -74,6 +74,20 @@ public class TempMessageModel implements Serializable {
     public void setIdmessage(MessageModel idmessage) {
         this.idmessage = idmessage;
     }
+
+    public int getStatusMessage() {
+        return statusMessage;
+    }
+
+    public RoomModel getIdRoom() {
+        return idRoom;
+    }
+
+    public void setIdRoom(RoomModel idRoom) {
+        this.idRoom = idRoom;
+    }
+    
+    
 
     @Override
     public String toString() {

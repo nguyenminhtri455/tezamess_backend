@@ -268,7 +268,7 @@ public class UserServiceImpl implements UserService {
                 throw new IOException();
             }
             array = new JSONArray(json);
-            if(array.length() == 0){
+            if (array.length() == 0) {
                 return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), null, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
             }
 
@@ -310,5 +310,10 @@ public class UserServiceImpl implements UserService {
                     list.add(map);
                 });
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), list, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    }
+
+    @Override
+    public UserModel getUserById(int id) {
+        return userRepositoryImpl.findUserById(id);
     }
 }

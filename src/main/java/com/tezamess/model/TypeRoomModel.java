@@ -10,21 +10,19 @@ import javax.persistence.Table;
 @Table(name = "typeroom")
 public class TypeRoomModel implements Serializable {
 
-    @Column(name = "name")
-    private String name;
-
-
     @Id
     @Column(name = "id")
     private String id;
+    
+    @Column(name = "name")
+    private String name;
     
     public TypeRoomModel() {
     }
 
 
-    public TypeRoomModel(String name) {
-   
-        this.name = name;
+    public TypeRoomModel(String id) {
+        this.id = id;
     }
 
     public String getId() {

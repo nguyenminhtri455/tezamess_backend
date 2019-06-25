@@ -38,7 +38,7 @@ public class RoomServiceImpl implements RoomService {
             List<Integer> listId;
             if (jSONArray.length() > 0) {
                 listId = new ArrayList<>();
-                 String nameRoom = jSONObject.getString("name");
+                String nameRoom = jSONObject.getString("name");
                 int creatorId = jSONObject.getInt("creator");
                 listId.add(creatorId);
                 for (int i = 0; i < jSONArray.length(); i++) {
@@ -47,7 +47,7 @@ public class RoomServiceImpl implements RoomService {
                 room = roomRepositoryImpl.findRoom(listId);
                 if (room != null) {
                     return room;
-                }            
+                }
                 room = roomRepositoryImpl.
                         createRoom(nameRoom,
                                 creatorId,

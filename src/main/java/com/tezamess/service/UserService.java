@@ -16,6 +16,8 @@ public interface UserService {
     ResponseEntity<Object> findUserById(int id);
 
     UserModel getUserByPhone(String phone);
+    
+    UserModel getUserById(int id);
 
     ResponseEntity<Object> updateUser(String token, String json);
 

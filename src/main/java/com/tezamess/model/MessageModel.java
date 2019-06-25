@@ -43,7 +43,7 @@ public class MessageModel implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private RoomModel room;
 
-    @JoinColumn(name = "userid")
+    @JoinColumn(name = "userid", updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private UserModel user;
 

@@ -24,6 +24,7 @@ public class RoomRepositoryImpl implements RoomRepository {
 
     @Override
     public RoomModel createRoom(String name, int idCreateUser, List<Integer> listId) {
+        System.out.println(listId.size());
         Session session = sessionFactory.getCurrentSession();
         RoomModel room = new RoomModel(); 
         if (listId.size() > 2) {
@@ -36,7 +37,6 @@ public class RoomRepositoryImpl implements RoomRepository {
         }
         if (idCreateUser != -1) {
 //            UserModel get = session.get(UserModel.class, idCreateUser);
-
             room.setCreator(new UserModel(idCreateUser));
         }
 

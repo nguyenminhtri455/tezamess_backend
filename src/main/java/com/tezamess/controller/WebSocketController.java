@@ -1,16 +1,21 @@
 package com.tezamess.controller;
 
 import com.tezamess.map.MappedRoomModel;
+import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ChatMessage;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.serviceimpl.MessageServiceImpl;
 import com.tezamess.serviceimpl.RoomServiceImpl;
+import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -27,6 +32,9 @@ public class WebSocketController {
 
     @Autowired
     private MessageServiceImpl messageServiceImpl;
+
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
     @Autowired
     private SimpMessagingTemplate sendingOperations;
@@ -59,16 +67,15 @@ public class WebSocketController {
     @SendTo("/room/{roomId}")
     public String sendMessage(@Payload String message, @DestinationVariable String roomId) {
         System.out.println(message);
- 
         return messageServiceImpl.saveMessage(message);
     }
 
-    //gui tin nhan den phong chat
+    //gui phan hoi trang thai tin nhan den phong chat
     @MessageMapping("/chat.sendMessageResponse/{roomId}")
     @SendTo("/room/{roomId}")
     public String sendMessageResponse(@Payload String message, @DestinationVariable String roomId) {
-        System.out.println(message);
-        return message;
+        System.out.println(message + " /chat.sendMessageResponse/" + roomId);
+        return messageServiceImpl.updateStatusMessage(message);
     }
 
     //gui yeu cau ket ban
@@ -78,19 +85,23 @@ public class WebSocketController {
         JSONObject jSONObject = new JSONObject(json);
         int id = jSONObject.getInt("idRequest");
         int idfriend = jSONObject.getInt("idFriend");
+        UserModel userRequest = userServiceImpl.getUserById(id);
+        UserModel userFriend = userServiceImpl.getUserById(idfriend);
+        List<Map<String, Object>> convertToListBy5Record = MappedUserModel.convertToListBy5Record(userRequest, userFriend);
         sendingOperations.convertAndSend("/room/user/" + id,
                 new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus(),
-                        jSONObject.toString(),
+                        convertToListBy5Record,
                         ResultModelV2.Status.ADD_FRIEND_REQUEST.name(),
                         new Date()));
 
         sendingOperations.convertAndSend("/room/user/" + idfriend,
                 new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus(),
-                        jSONObject.toString(),
+                        convertToListBy5Record,
                         ResultModelV2.Status.ADD_FRIEND_REQUEST.name(),
                         new Date()));
     }
 
+    //thong bao trang thai online 
     @MessageMapping("/chat.joinRoom/{roomId}")
     @SendTo("/room/{roomId}")
     public String joinRoom(@Payload String messageOnline, @DestinationVariable String roomId,
@@ -102,13 +113,63 @@ public class WebSocketController {
         if (!type.equals("Response")) {
             int id = jSONObject.getInt("user");
             headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
-//            sendingOperations.convertAndSend("/room/user/" + id,
-//                new ResultModelV2(ResultModelV2.Status.UNREAD_MESSAGE.getStatus(),
-//                        messageServiceImpl.getMessageaUnread(id),
-//                        ResultModelV2.Status.UNREAD_MESSAGE.name(),
-//                        new Date()));
         }
         return messageOnline;
+    }
+
+    //tai tin nhan chua doc
+    @MessageMapping("/load/messages.unread")
+    public String loadMessageUnread(@Payload String json) {
+        System.out.println(json);
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("id");
+        List<Map<String, Object>> messageaUnread = messageServiceImpl.getMessageaUnread(id);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.UNREAD_MESSAGE.getStatus(),
+                        messageaUnread,
+                        ResultModelV2.Status.UNREAD_MESSAGE.name(),
+                        new Date()));
+        return json;
+    }
+    
+    //loadmore tin nhan
+//    @MessageMapping("/loadmore/messages")
+//    public String loadMessage(@Payload String json) {
+//        System.out.println(json);
+//        JSONObject jSONObject = new JSONObject(json);
+//        int id = jSONObject.getInt("id");
+//        int idRoom = jSONObject.getInt("idRoom");
+//        List<Map<String, Object>> message = messageServiceImpl.getMessageaUnread(id);
+//        sendingOperations.convertAndSend("/room/user/" + id,
+//                new ResultModelV2(ResultModelV2.Status.LOADMORE_MESSAGE.getStatus(),
+//                        messageaUnread,
+//                        ResultModelV2.Status.LOADMORE_MESSAGE.name(),
+//                        new Date()));
+//        return json;
+//    }
+
+    //kiem tra trang thai tin nhan
+    @MessageMapping("/check/messages.status/{roomId}")
+    @SendTo("/room/{roomId}")
+    public String checkStatusMessage(@Payload String json, @DestinationVariable String roomId) {
+        System.out.println(json);
+        return messageServiceImpl.checkStatusMessage(json);
+    }
+
+    //tim user 
+    @MessageMapping("/find.user")
+    public void findUser(@Payload String json) {
+        // Add username in web socket session     
+        System.out.println(json);
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("id");
+        String phone = jSONObject.getString("phone");
+        UserModel userByPhone = userServiceImpl.getUserByPhone(phone);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.FIND_FRIEND.getStatus(),
+                        MappedUserModel.convertToMapBy4Record(userByPhone),
+                        ResultModelV2.Status.FIND_FRIEND.name(),
+                        new Date()));
     }
 
     //test by Android

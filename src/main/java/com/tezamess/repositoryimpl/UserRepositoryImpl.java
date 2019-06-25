@@ -151,6 +151,8 @@ public class UserRepositoryImpl implements UserRepository {
     public UserModel findUserByIdWithRoom(int id) {
         Session session = sessionFactory.getCurrentSession();
         UserModel user = session.get(UserModel.class, id);
+        user.setLastactive(new Date());
+        session.saveOrUpdate(user);
         user.getRoomModelList().size();
         if (user != null) {
             return user;

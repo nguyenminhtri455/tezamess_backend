@@ -21,10 +21,10 @@ public class FriendModel implements Serializable {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "useridrequest")
+    @JoinColumn(name = "useridrequest", updatable = false)
     private UserModel useridrequest;
 
-    @JoinColumn(name = "useridfriend")
+    @JoinColumn(name = "useridfriend", updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private UserModel useridfriend;
 
