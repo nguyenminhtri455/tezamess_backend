@@ -110,7 +110,7 @@ public class MessageServiceImpl implements MessageService {
         } catch (Exception ex) {
             System.out.println(ex.getMessage());
             return json;
-        }       
+        }
     }
 
     @Override
@@ -142,6 +142,12 @@ public class MessageServiceImpl implements MessageService {
             return json;
         }
         return json;
+    }
+
+    @Override
+    public List<Map<String, Object>> loadMessages(int idRoom, int start, int count) {
+        List<MessageModel> loadMessages = messageRepositoryImpl.loadMessages(idRoom, start, count);
+        return MappedMessageModel.convertListMessageChatNoStatus(loadMessages);
     }
 
 }

@@ -166,4 +166,17 @@ public class MessageRepositoryImpl implements MessageRepository {
         }
         return null;
     }
+
+    @Override
+    public List<MessageModel> loadMessages(int idRoom, int start, int count) {
+        Session ss = sessionFactory.getCurrentSession();
+        Query<MessageModel> query = ss.createQuery("FROM MessageModel m"
+                + " WHERE m.room.id = :idRoom"
+                + " ORDER BY m.id DESC", MessageModel.class);
+        query.setParameter("idRoom", idRoom);
+        query.setFirstResult(start);
+        query.setMaxResults(count);
+        List<MessageModel> resultList = query.getResultList();
+        return resultList;
+    }
 }

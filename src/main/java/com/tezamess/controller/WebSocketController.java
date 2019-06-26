@@ -131,22 +131,23 @@ public class WebSocketController {
                         new Date()));
         return json;
     }
-    
+
     //loadmore tin nhan
-//    @MessageMapping("/loadmore/messages")
-//    public String loadMessage(@Payload String json) {
-//        System.out.println(json);
-//        JSONObject jSONObject = new JSONObject(json);
-//        int id = jSONObject.getInt("id");
-//        int idRoom = jSONObject.getInt("idRoom");
-//        List<Map<String, Object>> message = messageServiceImpl.getMessageaUnread(id);
-//        sendingOperations.convertAndSend("/room/user/" + id,
-//                new ResultModelV2(ResultModelV2.Status.LOADMORE_MESSAGE.getStatus(),
-//                        messageaUnread,
-//                        ResultModelV2.Status.LOADMORE_MESSAGE.name(),
-//                        new Date()));
-//        return json;
-//    }
+    @MessageMapping("/loadmore/messages")
+    public void loadMessage(@Payload String json) {
+        System.out.println(json);
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("id");
+        int idRoom = jSONObject.getInt("idRoom");
+        int start = jSONObject.getInt("indexStart");
+        int count = jSONObject.getInt("count");
+        List<Map<String, Object>> loadMessages = messageServiceImpl.loadMessages(idRoom, start, count);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.LOADMORE_MESSAGE.getStatus(),
+                        loadMessages,
+                        ResultModelV2.Status.LOADMORE_MESSAGE.name(),
+                        new Date()));
+    }
 
     //kiem tra trang thai tin nhan
     @MessageMapping("/check/messages.status/{roomId}")

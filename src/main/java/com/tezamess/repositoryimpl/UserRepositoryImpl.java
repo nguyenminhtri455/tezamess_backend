@@ -45,7 +45,7 @@ public class UserRepositoryImpl implements UserRepository {
             for (RoomModel room : resultList.get(0).getRoomModelList()) {
                 Query query1 = session.createQuery("FROM MessageModel as m WHERE m.room.id = :idRoom ORDER BY m.id DESC");
                 query1.setFirstResult(0);
-                query1.setMaxResults(100);
+                query1.setMaxResults(50);
                 query1.setParameter("idRoom", room.getId());
                 List<MessageModel> resultList1 = query1.getResultList();
                 room.setMessageList(new HashSet<>(resultList1));

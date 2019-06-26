@@ -77,5 +77,22 @@ public class MappedMessageModel {
         });
         return list;
     }
+    
+       public static List<Map<String, Object>> convertListMessageChatNoStatus(List<MessageModel> messageModels) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        messageModels.stream()
+                .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
+                .forEach(t -> {
+            Map<String, Object> m1 = new HashMap<>();
+            m1.put("id", t.getId());
+            m1.put("body", t.getBody());
+            m1.put("createdate", t.getCreatedate().getTime());
+            m1.put("room", t.getRoomid().getId());
+            m1.put("user", t.getUserid().getId());
+            list.add(m1);
+        });
+        return list;
+    }
 
 }

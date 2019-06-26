@@ -10,8 +10,8 @@ public class FileUtils {
 //    private final String path = "http://192.168.0.105:8080/profile/";
 //    private final String path = "http://172.16.26.173:8080/profile/";
 //    private final String root = "/tezamess/src/main/resources/static/profile";
-
-    private final String path = "http://tezamess-tezamess.7e14.starter-us-west-2.openshiftapps.com/profile/";
+//    private final String path = "http://tezamess-tezamess.7e14.starter-us-west-2.openshiftapps.com/profile/";
+    private final String path = "http://tezamess-tezamess.1d35.starter-us-east-1.openshiftapps.com/profile/";
     private final String root = "/home/jboss/profile";
 
     public String uploadAvatar(String valueBase64, String name, String phone) {
@@ -25,9 +25,9 @@ public class FileUtils {
             File f = file.listFiles()[i];
             if (f.getName().lastIndexOf(phone) != -1) {
                 String[] nm = f.getName().split("\\.");
-                if(nm[0].length() - nm[0].lastIndexOf(phone) == 10){
+                if (nm[0].length() - nm[0].lastIndexOf(phone) == 10) {
                     f.delete();
-                }             
+                }
                 break;
             }
         }
