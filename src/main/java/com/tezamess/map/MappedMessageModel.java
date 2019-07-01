@@ -63,7 +63,6 @@ public class MappedMessageModel {
 
     public static List<Map<String, Object>> convertListMessageChat(List<MessageModel> messageModels) {
         List<Map<String, Object>> list = new ArrayList<>();
-
         messageModels.stream().forEach(t -> {
             Map<String, Object> m1 = new HashMap<>();
             m1.put("id", t.getId());
@@ -71,7 +70,7 @@ public class MappedMessageModel {
             m1.put("createdate", t.getCreatedate().getTime());
             m1.put("room", t.getRoomid().getId());
             m1.put("user", t.getUserid().getId());
-            m1.put("status", "Sent");
+            m1.put("status", "Received");
             m1.put("type", "Chat");
             list.add(m1);
         });

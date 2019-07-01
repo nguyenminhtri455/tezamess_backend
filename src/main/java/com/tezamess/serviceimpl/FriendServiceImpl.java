@@ -7,6 +7,7 @@ import com.tezamess.model.UserModel;
 import com.tezamess.repositoryimpl.FriendRepositoryImpl;
 import com.tezamess.service.FriendService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class FriendServiceImpl implements FriendService {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
         List<UserModel> friends = repositoryImpl.getFriends(id);
-        List<Map<String, Object>> mappingFriends = null;
+        List<Map<String, Object>> mappingFriends = new ArrayList<>();
         if (friends.size() > 0) {
             mappingFriends = friends.stream().map(t -> MappedUserModel.convertToMapBy4Record(t)).collect(Collectors.toList());
         }

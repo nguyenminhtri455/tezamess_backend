@@ -130,7 +130,8 @@ public class MessageRepositoryImpl implements MessageRepository {
         TempMessageModel tempMessage = query.getSingleResult();
         if (tempMessage != null) {
 
-            if (tempMessage.getStatusMessage() == 2) {
+            if (tempMessage.getStatusMessage() == 2 && 
+                    Objects.equals(tempMessage.getIdmessage().getId(), tempMessageModel.getIdmessage().getId())) {
                 return 2;
             }
 
@@ -159,7 +160,6 @@ public class MessageRepositoryImpl implements MessageRepository {
                     continue;
                 }
                 if (t.getStatusMessage() == 1 || t.getStatusMessage() == 2) {
-                    System.out.println(t.getIdmessage().getBody());
                     return t;
                 }
             }
