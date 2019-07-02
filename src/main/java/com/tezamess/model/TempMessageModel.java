@@ -28,7 +28,7 @@ public class TempMessageModel implements Serializable {
     private UserModel idmember;
 
     @JoinColumn(name = "idmessage")
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private MessageModel idmessage;
     
     @JoinColumn(name = "roomid", updatable = false)

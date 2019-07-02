@@ -30,8 +30,7 @@ public class MappedMessageModel {
         jSONObject.put("body", messageModel.getBody());
         jSONObject.put("user", messageModel.getUserid().getId());
         jSONObject.put("room", messageModel.getRoomid().getId());
-        jSONObject.put("type", "Chat");
-
+        jSONObject.put("type", "Chat");    
         switch (tempMessageModel.getStatusMessage()) {
             case -1:
                 jSONObject.put("status", "Unread");
@@ -56,7 +55,7 @@ public class MappedMessageModel {
         map.put("body", messageModel.getBody());
         map.put("user", messageModel.getUserid().getId());
         map.put("room", messageModel.getRoomid().getId());
-        map.put("status", "Seen");
+        map.put("status", "Sent");
         map.put("type", "Chat");
         return map;
     }
@@ -76,21 +75,21 @@ public class MappedMessageModel {
         });
         return list;
     }
-    
-       public static List<Map<String, Object>> convertListMessageChatNoStatus(List<MessageModel> messageModels) {
+
+    public static List<Map<String, Object>> convertListMessageChatNoStatus(List<MessageModel> messageModels) {
         List<Map<String, Object>> list = new ArrayList<>();
 
         messageModels.stream()
                 .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
                 .forEach(t -> {
-            Map<String, Object> m1 = new HashMap<>();
-            m1.put("id", t.getId());
-            m1.put("body", t.getBody());
-            m1.put("createdate", t.getCreatedate().getTime());
-            m1.put("room", t.getRoomid().getId());
-            m1.put("user", t.getUserid().getId());
-            list.add(m1);
-        });
+                    Map<String, Object> m1 = new HashMap<>();
+                    m1.put("id", t.getId());
+                    m1.put("body", t.getBody());
+                    m1.put("createdate", t.getCreatedate().getTime());
+                    m1.put("room", t.getRoomid().getId());
+                    m1.put("user", t.getUserid().getId());
+                    list.add(m1);
+                });
         return list;
     }
 

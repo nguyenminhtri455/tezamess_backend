@@ -19,12 +19,6 @@ public class RoomServiceImpl implements RoomService {
     private RoomRepositoryImpl roomRepositoryImpl;
 
     @Override
-    public RoomModel createRoom(String json) {
-
-        return null;
-    }
-
-    @Override
     public RoomModel findOrCreateRoom(String json) {
         JSONObject jSONObject;
         try {
@@ -64,7 +58,8 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public void deleteRoom(int id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public RoomModel findRoom(int idRoom) {
+        RoomModel room = roomRepositoryImpl.findRoom(idRoom);
+        return room;
     }
 }

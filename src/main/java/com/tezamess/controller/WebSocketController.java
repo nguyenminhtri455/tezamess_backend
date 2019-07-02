@@ -59,7 +59,25 @@ public class WebSocketController {
         } else {
             System.out.println("loi !!!!!");
         }
+    }
 
+    //tao phong chat
+    @MessageMapping("/room.find")
+    public void findRoom(@Payload String json) {
+        System.out.println(json);
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("id");
+        int idRoom = jSONObject.getInt("idRoom");
+        RoomModel room = roomServiceImpl.findRoom(idRoom);
+        if (room != null) {
+            sendingOperations.convertAndSend("/room/user/" + id,
+                    new ResultModelV2(ResultModelV2.Status.FIND_ROOM.getStatus(),
+                            MappedRoomModel.convertToMap(room),
+                            ResultModelV2.Status.FIND_ROOM.name(),
+                            new Date()));
+        } else {
+            System.out.println("loi !!!!!");
+        }
     }
 
     //gui tin nhan den phong chat
@@ -111,6 +129,22 @@ public class WebSocketController {
         JSONObject jSONObject = new JSONObject(messageOnline);
         String type = jSONObject.getString("type");
         if (!type.equals("Response")) {
+            int id = jSONObject.getInt("user");      
+            headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
+        }
+        return messageOnline;
+    }
+
+    //thong bao trang thai online den ban be
+    @MessageMapping("/notifyOnline/{userId}")
+    @SendTo("/room/user/{userId}")
+    public String notifyOnline(@Payload String messageOnline, @DestinationVariable String userId,
+            SimpMessageHeaderAccessor headerAccessor) {
+        // Add username in web socket session     
+        System.out.println(messageOnline);
+        JSONObject jSONObject = new JSONObject(messageOnline);
+        String type = jSONObject.getString("type");
+        if (!type.equals("Response")) {
             int id = jSONObject.getInt("user");
             headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
         }
@@ -154,7 +188,8 @@ public class WebSocketController {
     @SendTo("/room/{roomId}")
     public String checkStatusMessage(@Payload String json, @DestinationVariable String roomId) {
         System.out.println(json);
-        return messageServiceImpl.checkStatusMessage(json);
+        String checkStatusMessage = messageServiceImpl.checkStatusMessage(json);
+        return checkStatusMessage;
     }
 
     //tim user 

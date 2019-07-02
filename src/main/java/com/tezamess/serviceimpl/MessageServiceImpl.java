@@ -130,7 +130,7 @@ public class MessageServiceImpl implements MessageService {
             messageModel.setId(id);
             messageModel.setRoomid(new RoomModel(roomId));
             messageModel.setUserid(new UserModel(senderId));
-            TempMessageModel checkStatusMessage = messageRepositoryImpl.checkStatusMessage(messageModel);
+            TempMessageModel checkStatusMessage = messageRepositoryImpl.checkStatusMessage(messageModel);          
             if (checkStatusMessage != null) {
                 return MappedMessageModel.convertToJsonMessageChat(checkStatusMessage);
             }

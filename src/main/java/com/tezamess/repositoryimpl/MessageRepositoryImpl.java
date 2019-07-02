@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class MessageRepositoryImpl implements MessageRepository {
 
     @Autowired
-    SessionFactory sessionFactory;
+    private SessionFactory sessionFactory;
 
     @Override
     public MessageModel saveMessage(MessageModel message) {
