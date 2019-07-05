@@ -86,8 +86,9 @@ public class MainController implements ErrorController {
     }
 
     @GetMapping("/tezamess/api-test")
-    public ResponseEntity<Object> testAPI(String json) {
-        RoomModel room = roomServiceImpl.findOrCreateRoom(null);
+    public ResponseEntity<Object> testAPI(@RequestBody(required = false) String json) {
+        System.out.println(json);
+        RoomModel room = roomServiceImpl.findOrCreateRoom(json);
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedRoomModel.convertToMap(room), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
 
     }

@@ -26,7 +26,7 @@ public class RoomRepositoryImpl implements RoomRepository {
     public RoomModel createRoom(String name, int idCreateUser, List<Integer> listId) {
         System.out.println(listId.size());
         Session session = sessionFactory.getCurrentSession();
-        RoomModel room = new RoomModel(); 
+        RoomModel room = new RoomModel();
         if (listId.size() > 2) {
             room.setTypeRoomModel(new TypeRoomModel("G"));
         } else {
@@ -43,7 +43,7 @@ public class RoomRepositoryImpl implements RoomRepository {
         session.save(room);
 
         Query query = session.createQuery("From UserModel WHERE id IN :ids", UserModel.class);
-        
+
         query.setParameterList("ids", listId);
         List<UserModel> resultList = query.getResultList();
         Set<UserModel> set = new HashSet<UserModel>(resultList);
@@ -71,11 +71,11 @@ public class RoomRepositoryImpl implements RoomRepository {
     public RoomModel findRoom(List<Integer> listId) {
         Session session = sessionFactory.getCurrentSession();
 
-        Query query = session.createSQLQuery("SELECT * FROM "
-                + " participation WHERE groupid IN (SELECT DISTINCT p.groupid FROM room,member,participation as p"
-                + " WHERE p.userid = member.id AND p.groupid = room.id AND p.userid IN :ids)"
-                + " GROUP BY groupid"
-                + " HAVING COUNT(*) = :size");
+//        Query query = session.createSQLQuery("SELECT * FROM "
+//                + " participation WHERE groupid IN (SELECT DISTINCT p.groupid FROM room,member,participation as p"
+//                + " WHERE p.userid = member.id AND p.groupid = room.id AND p.userid IN :ids)"
+//                + " GROUP BY groupid"
+//                + " HAVING COUNT(*) = :size");
 //        Query query = session.createQuery("FROM RoomModel as d"
 //                + " WHERE d.id IN (SELECT DISTINCT r.id FROM RoomModel r JOIN r.userModelList e"
 //                + " WHERE e.id IN :ids)"
@@ -83,9 +83,12 @@ public class RoomRepositoryImpl implements RoomRepository {
 //        Query query = session.createQuery("FROM RoomModel r JOIN r.userModelList e"
 //                + " WHERE e.id IN :ids"
 //                + " GROUP BY r");
+        Query query = session.createSQLQuery("SELECT * FROM participation as p"
+                + " WHERE p.userid IN :ids"
+                + " GROUP BY p.groupid"
+                + " HAVING COUNT(*) = :size");
         query.setParameterList("ids", listId);
         query.setParameter("size", listId.size());
-
         List<Object[]> resultList = query.getResultList();
         for (Object[] o : resultList) {
             RoomModel room = session.get(RoomModel.class, (int) o[0]);
