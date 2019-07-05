@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
+import com.tezamess.repository.FriendRepository;
 import com.tezamess.utils.FileUtils;
 import java.util.Base64;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -36,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepositoryImpl userRepositoryImpl;
+
+    @Autowired
+    private FriendRepository friendRepository;
 
     @Autowired
     private JwtService jwtService;
@@ -48,6 +53,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private FileUtils fileUtils;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Override
     public List<Map<String, Object>> findAll() {
@@ -269,7 +277,7 @@ public class UserServiceImpl implements UserService {
             }
             array = new JSONArray(json);
             if (array.length() == 0) {
-                return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), null, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+                return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), new ArrayList(), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
             }
 
         } catch (IOException | JSONException ex) {
@@ -292,7 +300,7 @@ public class UserServiceImpl implements UserService {
 
         List<Object[]> listUserModel = userRepositoryImpl.checkUserUsingApp(findUserByPhone.getId(), array.toList());
         if (listUserModel == null) {
-            return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), null, Status.SUCCESS.name(), new Date()), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), new ArrayList(), Status.SUCCESS.name(), new Date()), HttpStatus.BAD_REQUEST);
         }
 
         int size = listUserModel.size();
@@ -315,5 +323,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserModel getUserById(int id) {
         return userRepositoryImpl.findUserById(id);
+    }
+
+    @Override
+    public void notifyOnlineToRoomAndFriend(int userId) {
+        List<UserModel> friends = friendRepository.getFriends(userId);
+        Map<String, Object> mapFriend = new HashMap<>();
+        mapFriend.put("createdate", new Date().getTime());
+        mapFriend.put("body", "Online");
+        mapFriend.put("user", userId);
+        mapFriend.put("type", "Notify");
+        mapFriend.put("status", -1);
+        friends.stream().forEach(t -> {
+            mapFriend.put("friend", t.getId());
+            messagingTemplate.convertAndSend("/room/user/" + t.getId(), mapFriend);
+        });
+
+        //-------------------------------
+        
+        UserModel user = userRepositoryImpl.findUserByIdWithRoom(userId);
+
+        Map<String, Object> mapRoom = new HashMap<>();    
+        mapRoom.put("createdate", new Date().getTime());
+        mapRoom.put("body", "Online");
+        mapRoom.put("user", userId);
+        mapRoom.put("type", "Notify");
+        mapRoom.put("status", "Online");      
+        user.getRoomModelList().stream().forEach(t -> {
+            mapRoom.put("room", t.getId());
+            messagingTemplate.convertAndSend("/room/" + t.getId(), mapRoom);
+        });
     }
 }

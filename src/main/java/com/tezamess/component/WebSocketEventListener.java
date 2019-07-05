@@ -35,6 +35,7 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
+        System.out.println("ngat ket noi");
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
         String username = (String) headerAccessor.getSessionAttributes().get("username");
@@ -45,15 +46,14 @@ public class WebSocketEventListener {
 
             map.put("createdate", new Date().getTime());
             map.put("body", "Offline");
-            map.put("user", Integer.parseInt(username));
+            map.put("user", id);
             map.put("status", "Offline");
             map.put("type", "Notify");
 
+            userRepositoryImpl.updateLastActive(id);
+
             UserModel user = userRepositoryImpl.findUserByIdWithRoom(id);
-    System.out.println("a");
             user.getRoomModelList().stream().forEach(t -> {
-                    System.out.println("b");
-                System.out.println(t.getId() + " : User Disconnected : " + username);
                 map.put("room", t.getId());
                 messagingTemplate.convertAndSend("/room/" + t.getId(), map);
             });
@@ -61,17 +61,15 @@ public class WebSocketEventListener {
             Map<String, Object> mapFriend = new HashMap<>();
             mapFriend.put("createdate", new Date().getTime());
             mapFriend.put("body", "Offline");
-            mapFriend.put("friend", id);
             mapFriend.put("user", id);
             mapFriend.put("type", "Notify");
             mapFriend.put("status", -1);
             List<UserModel> friends = friendRepositoryImpl.getFriends(Integer.parseInt(username));
-            System.out.println("c");
             friends.stream().forEach(t -> {
-                    System.out.println("d");
+                mapFriend.put("friend", t.getId());
                 messagingTemplate.convertAndSend("/room/user/" + t.getId(), mapFriend);
             });
-
+            System.out.println(" : User Disconnected : " + username);
         }
     }
 }

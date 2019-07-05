@@ -29,7 +29,7 @@ public class FriendServiceImpl implements FriendService {
     private Environment environment;
 
     @Autowired
-    private FriendRepositoryImpl repositoryImpl;
+    private FriendRepositoryImpl friendRepositoryImpl;
 
     @Override
     public ResponseEntity<Object> getFriends(String json) {
@@ -48,13 +48,20 @@ public class FriendServiceImpl implements FriendService {
         } catch (Exception ex) {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        List<UserModel> friends = repositoryImpl.getFriends(id);
+        List<UserModel> friends = friendRepositoryImpl.getFriends(id);
         List<Map<String, Object>> mappingFriends = new ArrayList<>();
         if (friends.size() > 0) {
             mappingFriends = friends.stream().map(t -> MappedUserModel.convertToMapBy4Record(t)).collect(Collectors.toList());
         }
 
         return new ResponseEntity<>(new ResultModelV2(ResultModelV2.Status.SUCCESS.getStatus(), mappingFriends, ResultModelV2.Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    }
+
+    @Override
+    public void addFriend(int id, int idfriend, int status) {
+        if (status == 1) {
+            friendRepositoryImpl.addFriend(id, idfriend);
+        }
     }
 
 }

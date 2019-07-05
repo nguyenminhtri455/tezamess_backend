@@ -24,4 +24,6 @@ public interface UserService {
     ResponseEntity<Object> findUserByPhone(String token, String json);
 
     ResponseEntity<Object> userUsingApp(String token, String json);
+    
+    void notifyOnlineToRoomAndFriend(int userId);
 }

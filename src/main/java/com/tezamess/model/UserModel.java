@@ -22,23 +22,6 @@ import javax.persistence.TemporalType;
 @Table(name = "member")
 public class UserModel implements Serializable {
 
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid", fetch = FetchType.LAZY)
-//    private List<CommentModel> commentList;
-//
-//    @JoinTable(name = "likestatus", joinColumns = {
-//        @JoinColumn(name = "userid", referencedColumnName = "id")}, inverseJoinColumns = {
-//        @JoinColumn(name = "statusid", referencedColumnName = "id")})
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    private List<StatusModel> statusList;
-//
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userModel", fetch = FetchType.LAZY)
-//    private List<StatusModel> statusList1;
-//
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userid", fetch = FetchType.LAZY)
-//    private Set<MessageModel> messageList;
-//
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "creator", fetch = FetchType.LAZY)
-//    private List<RoomModel> roomModelList1;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "participation",
             joinColumns = {

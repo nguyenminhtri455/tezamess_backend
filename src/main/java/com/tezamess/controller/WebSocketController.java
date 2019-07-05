@@ -6,6 +6,7 @@ import com.tezamess.model.ChatMessage;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
+import com.tezamess.serviceimpl.FriendServiceImpl;
 import com.tezamess.serviceimpl.MessageServiceImpl;
 import com.tezamess.serviceimpl.RoomServiceImpl;
 import com.tezamess.serviceimpl.UserServiceImpl;
@@ -32,6 +33,9 @@ public class WebSocketController {
 
     @Autowired
     private MessageServiceImpl messageServiceImpl;
+
+    @Autowired
+    private FriendServiceImpl friendServiceImpl;
 
     @Autowired
     private UserServiceImpl userServiceImpl;
@@ -119,19 +123,37 @@ public class WebSocketController {
                         new Date()));
     }
 
+    //phan hoi yeu cau ket ban
+    @MessageMapping("/response/addfriend")
+    public void responseAddfriend(@Payload String json) {
+        System.out.println(json);
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("idRequest");
+        int idfriend = jSONObject.getInt("idFriend");
+        int status = jSONObject.getInt("status");
+        friendServiceImpl.addFriend(id, idfriend, status);
+        ResultModelV2 resultModelV2;
+        if (status == 0) {
+            resultModelV2 = new ResultModelV2(ResultModelV2.Status.DISAGREE_ADDFRIEND.getStatus(),
+                    json,
+                    ResultModelV2.Status.DISAGREE_ADDFRIEND.name(),
+                    new Date());
+        } else {
+            resultModelV2 = new ResultModelV2(ResultModelV2.Status.AGREE_ADDFRIEND.getStatus(),
+                    json,
+                    ResultModelV2.Status.AGREE_ADDFRIEND.name(),
+                    new Date());
+        }
+        sendingOperations.convertAndSend("/room/user/" + id, resultModelV2);
+        sendingOperations.convertAndSend("/room/user/" + idfriend, resultModelV2);
+    }
+
     //thong bao trang thai online 
     @MessageMapping("/chat.joinRoom/{roomId}")
     @SendTo("/room/{roomId}")
     public String joinRoom(@Payload String messageOnline, @DestinationVariable String roomId,
-            SimpMessageHeaderAccessor headerAccessor) {
-        // Add username in web socket session     
+            SimpMessageHeaderAccessor headerAccessor) {    
         System.out.println(messageOnline);
-        JSONObject jSONObject = new JSONObject(messageOnline);
-        String type = jSONObject.getString("type");
-        if (!type.equals("Response")) {
-            int id = jSONObject.getInt("user");      
-            headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
-        }
         return messageOnline;
     }
 
@@ -139,16 +161,21 @@ public class WebSocketController {
     @MessageMapping("/notifyOnline/{userId}")
     @SendTo("/room/user/{userId}")
     public String notifyOnline(@Payload String messageOnline, @DestinationVariable String userId,
+            SimpMessageHeaderAccessor headerAccessor) {   
+        System.out.println(messageOnline);
+        return messageOnline;
+    }
+
+    //thong bao trang thai online den ban be
+    @MessageMapping("/notifyConnect")
+    public void notifyConnect(@Payload String messageConnect,
             SimpMessageHeaderAccessor headerAccessor) {
         // Add username in web socket session     
-        System.out.println(messageOnline);
-        JSONObject jSONObject = new JSONObject(messageOnline);
-        String type = jSONObject.getString("type");
-        if (!type.equals("Response")) {
-            int id = jSONObject.getInt("user");
-            headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
-        }
-        return messageOnline;
+        System.out.println(messageConnect);
+        JSONObject jSONObject = new JSONObject(messageConnect);
+        int id = jSONObject.getInt("user");       
+        headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
+        userServiceImpl.notifyOnlineToRoomAndFriend(id);
     }
 
     //tai tin nhan chua doc

@@ -22,4 +22,6 @@ public interface UserRepository {
     Boolean userExists(UserModel user);
 
     List<Object[]> checkUserUsingApp(int id, List<Object> listUser);
+    
+    void updateLastActive(int id);
 }

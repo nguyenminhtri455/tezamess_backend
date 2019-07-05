@@ -33,7 +33,7 @@ public class FriendRepositoryImpl implements FriendRepository {
 
         friends.stream().forEach(t -> {
             if (idUser != t.getUseridfriend().getId()) {
-               listUser.add(session.get(UserModel.class, t.getUseridfriend().getId()));
+                listUser.add(session.get(UserModel.class, t.getUseridfriend().getId()));
             }
             if (idUser != t.getUseridrequest().getId()) {
                 listUser.add(session.get(UserModel.class, t.getUseridrequest().getId()));
@@ -42,4 +42,12 @@ public class FriendRepositoryImpl implements FriendRepository {
         return listUser;
     }
 
+    @Override
+    public void addFriend(int id, int idfriend) {
+        Session session = sessionFactory.getCurrentSession();
+        FriendModel friendModel = new FriendModel();
+        friendModel.setUseridrequest(new UserModel(idfriend));
+        friendModel.setUseridfriend(new UserModel(id));
+        session.save(friendModel);
+    }
 }

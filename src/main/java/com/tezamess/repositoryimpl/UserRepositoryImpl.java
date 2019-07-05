@@ -4,13 +4,10 @@ import com.tezamess.model.MessageModel;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.repository.UserRepository;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -151,12 +148,18 @@ public class UserRepositoryImpl implements UserRepository {
     public UserModel findUserByIdWithRoom(int id) {
         Session session = sessionFactory.getCurrentSession();
         UserModel user = session.get(UserModel.class, id);
-        user.setLastactive(new Date());
-        session.saveOrUpdate(user);
-        user.getRoomModelList().size();
         if (user != null) {
+            user.getRoomModelList().size();
             return user;
         }
         return null;
+    }
+
+    @Override
+    public void updateLastActive(int id) {
+        Session session = sessionFactory.getCurrentSession();
+        UserModel user = session.get(UserModel.class, id);
+        user.setLastactive(new Date());
+        session.saveOrUpdate(user);
     }
 }
