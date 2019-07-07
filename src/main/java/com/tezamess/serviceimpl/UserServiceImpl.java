@@ -255,6 +255,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<Object> findUserById(int id) {
         UserModel user = userRepositoryImpl.findUserById(id);
+        System.out.println(user.getName());
         if (user != null) {
             user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
             return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(user), Status.SUCCESS.name(), new Date()), HttpStatus.OK);

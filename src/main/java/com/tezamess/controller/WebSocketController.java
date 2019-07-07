@@ -43,7 +43,7 @@ public class WebSocketController {
     @Autowired
     private SimpMessagingTemplate sendingOperations;
 
-    //tao phong chat
+    //tim hoac tao phong chat
     @MessageMapping("/room.create")
     public void createRoom(@Payload String json) {
         System.out.println(json);
@@ -65,7 +65,7 @@ public class WebSocketController {
         }
     }
 
-    //tao phong chat
+    //tim phong chat
     @MessageMapping("/room.find")
     public void findRoom(@Payload String json) {
         System.out.println(json);
