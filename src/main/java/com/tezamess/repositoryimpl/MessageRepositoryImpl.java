@@ -179,4 +179,5 @@ public class MessageRepositoryImpl implements MessageRepository {
         List<MessageModel> resultList = query.getResultList();
         return resultList;
     }
+
 }

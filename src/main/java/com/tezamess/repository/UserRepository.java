@@ -13,6 +13,8 @@ public interface UserRepository {
 
     UserModel updateUser(UserModel user);
 
+    UserModel changePassword(UserModel user);
+
     UserModel findUserById(int id);
 
     UserModel findUserByIdWithRoom(int id);
@@ -22,6 +24,6 @@ public interface UserRepository {
     Boolean userExists(UserModel user);
 
     List<Object[]> checkUserUsingApp(int id, List<Object> listUser);
-    
+
     void updateLastActive(int id);
 }

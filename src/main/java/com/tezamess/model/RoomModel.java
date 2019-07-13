@@ -40,6 +40,9 @@ public class RoomModel implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "avatar", length = 500)
+    private String avatar;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "creator", referencedColumnName = "id", updatable = false)
     private UserModel creator;
@@ -75,6 +78,16 @@ public class RoomModel implements Serializable {
     public void setCreator(UserModel creator) {
         this.creator = creator;
     }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+    
+    
 
     @Override
     public String toString() {

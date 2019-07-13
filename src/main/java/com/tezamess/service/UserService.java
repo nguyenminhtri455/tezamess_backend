@@ -16,14 +16,16 @@ public interface UserService {
     ResponseEntity<Object> findUserById(int id);
 
     UserModel getUserByPhone(String phone);
-    
+
     UserModel getUserById(int id);
 
     ResponseEntity<Object> updateUser(String token, String json);
 
+    ResponseEntity<Object> changePassword(String token, String json);
+
     ResponseEntity<Object> findUserByPhone(String token, String json);
 
     ResponseEntity<Object> userUsingApp(String token, String json);
-    
+
     void notifyOnlineToRoomAndFriend(int userId);
 }

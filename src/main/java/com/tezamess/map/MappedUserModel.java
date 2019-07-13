@@ -19,8 +19,8 @@ public class MappedUserModel {
         map.put("password", user.getPassword());
         map.put("birthday", user.getBirthday());
         map.put("gender", user.getGender());
+        map.put("email", user.getEmail());
         map.put("urlavatar", user.getUrlavatar());
-        map.put("online", user.getOnline());
         map.put("lastactive", user.getLastactive());
         return map;
     }
@@ -54,6 +54,21 @@ public class MappedUserModel {
         return list;
     }
 
+    public static List<Map<String, Object>> convertToListBy5Record(List<UserModel> friends) {
+        List<Map<String, Object>> list = new ArrayList();
+        friends.stream().forEach(t -> {
+            Map<String, Object> map2 = new HashMap<>();
+            map2.put("id", t.getId());
+            map2.put("phone", t.getPhone());
+            map2.put("name", t.getName());
+            map2.put("urlavatar", t.getUrlavatar());
+            map2.put("lastactive", t.getLastactive().getTime());
+            list.add(map2);
+        });
+        System.out.println(list.size() + " kich thuoc");
+        return list;
+    }
+
     public static Map<String, Object> convertToMapWithRooms(UserModel user) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", user.getId());
@@ -61,9 +76,9 @@ public class MappedUserModel {
         map.put("name", user.getName());
         map.put("password", user.getPassword());
         map.put("birthday", user.getBirthday());
+        map.put("email", user.getEmail());
         map.put("gender", user.getGender());
         map.put("urlavatar", user.getUrlavatar());
-        map.put("online", user.getOnline());
         map.put("lastactive", user.getLastactive());
         List<Map<String, Object>> rooms = new ArrayList<>();
         user.getRoomModelList().stream()

@@ -15,4 +15,5 @@ public interface MessageRepository {
     int updateStatusMessage(TempMessageModel tempMessageModel);
 
     TempMessageModel checkStatusMessage(MessageModel messageModel);
+   
 }

@@ -38,6 +38,9 @@ public class UserModel implements Serializable {
     @Column(name = "phone", unique = true, nullable = false, length = 10)
     private String phone;
 
+    @Column(name = "email", unique = true, nullable = true, length = 100)
+    private String email;
+
     @Column(name = "name", nullable = false, length = 30)
     private String name;
 
@@ -54,31 +57,15 @@ public class UserModel implements Serializable {
     @Column(name = "urlavatar", length = 500)
     private String urlavatar;
 
-    @Column(name = "online")
-    private boolean online;
-
     @Column(name = "lastactive")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastactive;
 
     public UserModel() {
-
     }
 
     public UserModel(Integer id) {
         this.id = id;
-    }
-
-    public UserModel(Integer id, String phone, String name, String password, Date birthday, boolean gender, String urlavatar, boolean online, Date lastactive) {
-        this.id = id;
-        this.phone = phone;
-        this.name = name;
-        this.password = password;
-        this.birthday = birthday;
-        this.gender = gender;
-        this.urlavatar = urlavatar;
-        this.online = online;
-        this.lastactive = lastactive;
     }
 
     public Integer getId() {
@@ -103,6 +90,14 @@ public class UserModel implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -137,14 +132,6 @@ public class UserModel implements Serializable {
         this.urlavatar = urlavatar;
     }
 
-    public boolean getOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
-
     public Date getLastactive() {
         return lastactive;
     }
@@ -165,46 +152,5 @@ public class UserModel implements Serializable {
     public void setRoomModelList(Set<RoomModel> roomModelList) {
         this.roomModelList = roomModelList;
     }
-    
-   
 
-//    public Set<MessageModel> getMessageList() {
-//        return messageList;
-//    }
-//
-//    public void setMessageList(Set<MessageModel> messageList) {
-//        this.messageList = messageList;
-//    }
-//
-//    public List<RoomModel> getRoomModelList1() {
-//        return roomModelList1;
-//    }
-//
-//    public void setRoomModelList1(List<RoomModel> roomModelList1) {
-//        this.roomModelList1 = roomModelList1;
-//    }
-//
-//    public List<StatusModel> getStatusList() {
-//        return statusList;
-//    }
-//
-//    public void setStatusList(List<StatusModel> statusList) {
-//        this.statusList = statusList;
-//    }
-//
-//    public List<StatusModel> getStatusList1() {
-//        return statusList1;
-//    }
-//
-//    public void setStatusList1(List<StatusModel> statusList1) {
-//        this.statusList1 = statusList1;
-//    }
-//
-//    public List<CommentModel> getCommentList() {
-//        return commentList;
-//    }
-//
-//    public void setCommentList(List<CommentModel> commentList) {
-//        this.commentList = commentList;
-//    }
 }

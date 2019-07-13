@@ -1,10 +1,13 @@
 package com.tezamess.controller;
 
 import com.tezamess.map.MappedRoomModel;
+import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
 import com.tezamess.model.RoomModel;
+import com.tezamess.model.UserModel;
 import com.tezamess.model.WelcomeModel;
+import com.tezamess.repositoryimpl.FriendRepositoryImpl;
 import com.tezamess.serviceimpl.FriendServiceImpl;
 import com.tezamess.serviceimpl.RoomServiceImpl;
 
@@ -30,7 +33,7 @@ public class MainController implements ErrorController {
 
     @Autowired
     private UserServiceImpl userServiceImpl;
-    
+
     @Autowired
     private RoomServiceImpl roomServiceImpl;
 
@@ -79,17 +82,26 @@ public class MainController implements ErrorController {
     public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.updateUser(token, json);
     }
+    
+    @PutMapping("tezamess/api/change-password")
+    public ResponseEntity<Object> changePassword(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
+        return userServiceImpl.updateUser(token, json);
+    }
 
     @PostMapping("tezamess/api/get-friends")
     public ResponseEntity<Object> getFriends(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return friendServiceImpl.getFriends(json);
     }
 
+    //test
+    @Autowired
+    FriendRepositoryImpl friendRepositoryImpl;
+
     @GetMapping("/tezamess/api-test")
     public ResponseEntity<Object> testAPI(@RequestBody(required = false) String json) {
         System.out.println(json);
-        RoomModel room = roomServiceImpl.findOrCreateRoom(json);
-        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedRoomModel.convertToMap(room), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+        List<UserModel> requestAddFriend = friendRepositoryImpl.getRequestAddFriend(194);
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMapBy4Record(requestAddFriend.get(0)), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
 
     }
 

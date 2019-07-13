@@ -107,6 +107,7 @@ public class WebSocketController {
         JSONObject jSONObject = new JSONObject(json);
         int id = jSONObject.getInt("idRequest");
         int idfriend = jSONObject.getInt("idFriend");
+        friendServiceImpl.requestAddFriend(id, idfriend);
         UserModel userRequest = userServiceImpl.getUserById(id);
         UserModel userFriend = userServiceImpl.getUserById(idfriend);
         List<Map<String, Object>> convertToListBy5Record = MappedUserModel.convertToListBy5Record(userRequest, userFriend);
@@ -133,7 +134,7 @@ public class WebSocketController {
         int status = jSONObject.getInt("status");
         friendServiceImpl.addFriend(id, idfriend, status);
         ResultModelV2 resultModelV2;
-        if (status == 0) {
+        if (status == -1) {
             resultModelV2 = new ResultModelV2(ResultModelV2.Status.DISAGREE_ADDFRIEND.getStatus(),
                     json,
                     ResultModelV2.Status.DISAGREE_ADDFRIEND.name(),
@@ -148,11 +149,21 @@ public class WebSocketController {
         sendingOperations.convertAndSend("/room/user/" + idfriend, resultModelV2);
     }
 
+    //phan hoi da nhan phan hoi ket ban
+    @MessageMapping("/response/receivedaddfriend")
+    public void responseAgreeAddfriend(@Payload String json) {
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("idRequest");
+        int status = jSONObject.getInt("status");
+        // xoa nhung record co trang thai la 1 cua nguoi gui
+        friendServiceImpl.removeTempFriend(id, status);
+    }
+
     //thong bao trang thai online 
     @MessageMapping("/chat.joinRoom/{roomId}")
     @SendTo("/room/{roomId}")
     public String joinRoom(@Payload String messageOnline, @DestinationVariable String roomId,
-            SimpMessageHeaderAccessor headerAccessor) {    
+            SimpMessageHeaderAccessor headerAccessor) {
         System.out.println(messageOnline);
         return messageOnline;
     }
@@ -161,7 +172,7 @@ public class WebSocketController {
     @MessageMapping("/notifyOnline/{userId}")
     @SendTo("/room/user/{userId}")
     public String notifyOnline(@Payload String messageOnline, @DestinationVariable String userId,
-            SimpMessageHeaderAccessor headerAccessor) {   
+            SimpMessageHeaderAccessor headerAccessor) {
         System.out.println(messageOnline);
         return messageOnline;
     }
@@ -173,9 +184,33 @@ public class WebSocketController {
         // Add username in web socket session     
         System.out.println(messageConnect);
         JSONObject jSONObject = new JSONObject(messageConnect);
-        int id = jSONObject.getInt("user");       
+        int id = jSONObject.getInt("user");
         headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
         userServiceImpl.notifyOnlineToRoomAndFriend(id);
+
+        // get request_addfriend
+        List<Map<String, Object>> requestAddFriend = friendServiceImpl.getRequestAddFriend(id);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.REQUEST_ADDFRIEND.getStatus(),
+                        requestAddFriend,
+                        ResultModelV2.Status.REQUEST_ADDFRIEND.name(),
+                        new Date()));
+
+        // get response addfriend
+        List<Map<String, Object>> responseAddFriend = friendServiceImpl.getResponseAddFriend(id);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.RESPONSE_ADDFRIEND.getStatus(),
+                        responseAddFriend,
+                        ResultModelV2.Status.RESPONSE_ADDFRIEND.name(),
+                        new Date()));
+
+        // get response disagree addfriend
+        List<Map<String, Object>> responseDisAgreeAddFriend = friendServiceImpl.getDisAgreeResponseAddFriend(id);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.RESPONSE_DISAGREE_ADDFRIEND.getStatus(),
+                        responseDisAgreeAddFriend,
+                        ResultModelV2.Status.RESPONSE_DISAGREE_ADDFRIEND.name(),
+                        new Date()));
     }
 
     //tai tin nhan chua doc

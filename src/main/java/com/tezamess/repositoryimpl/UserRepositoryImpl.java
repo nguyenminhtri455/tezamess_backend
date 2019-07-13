@@ -57,7 +57,6 @@ public class UserRepositoryImpl implements UserRepository {
         userModel.setBirthday(new Date());
         userModel.setLastactive(new Date());
         userModel.setGender(false);
-        userModel.setOnline(false);
         String passwordEncryption = Base64.getEncoder().encodeToString(userModel.getPassword().getBytes());
         userModel.setPassword(passwordEncryption);
         if (userExists(userModel)) {
@@ -70,6 +69,22 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public UserModel updateUser(UserModel user) {
+        Session session = sessionFactory.getCurrentSession();
+        UserModel userModel = findUserByPhone(user.getPhone());
+        if (userModel != null) {
+            userModel.setName(user.getName());
+            userModel.setGender(user.getGender());
+            userModel.setBirthday(user.getBirthday());
+            if (user.getUrlavatar() != null) {
+                userModel.setUrlavatar(user.getUrlavatar());
+            }
+            return userModel;
+        }
+        return null;
+    }
+
+    @Override
+    public UserModel changePassword(UserModel user) {
         Session session = sessionFactory.getCurrentSession();
         UserModel userModel = findUserByPhone(user.getPhone());
         if (userModel != null) {

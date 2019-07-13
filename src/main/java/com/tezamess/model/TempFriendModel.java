@@ -20,11 +20,11 @@ public class TempFriendModel implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "useridrequest", updatable = false)
     private UserModel userRequest;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "useridfriend", updatable = false)
     private UserModel userFriend;
 

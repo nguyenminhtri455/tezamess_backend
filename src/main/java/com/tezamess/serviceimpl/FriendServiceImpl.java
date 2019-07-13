@@ -62,6 +62,37 @@ public class FriendServiceImpl implements FriendService {
         if (status == 1) {
             friendRepositoryImpl.addFriend(id, idfriend);
         }
+        if (status == -1) {
+            friendRepositoryImpl.disAgreeAddFriend(id, idfriend);
+        }
+    }
+
+    @Override
+    public void requestAddFriend(int idUserRequest, int idUserFriend) {
+        friendRepositoryImpl.requestAddFriend(idUserRequest, idUserFriend);
+    }
+
+    @Override
+    public List<Map<String, Object>> getRequestAddFriend(int idUserFriend) {
+        List<UserModel> requestAddFriend = friendRepositoryImpl.getRequestAddFriend(idUserFriend);
+        return MappedUserModel.convertToListBy5Record(requestAddFriend);
+    }
+
+    @Override
+    public List<Map<String, Object>> getResponseAddFriend(int idUserRequest) {
+        List<UserModel> responseAddFriend = friendRepositoryImpl.getResponseAddFriend(idUserRequest);
+        return MappedUserModel.convertToListBy5Record(responseAddFriend);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDisAgreeResponseAddFriend(int idUserRequest) {
+        List<UserModel> responseDisAgreeAddFriend = friendRepositoryImpl.getDisAgreeResponseAddFriend(idUserRequest);
+        return MappedUserModel.convertToListBy5Record(responseDisAgreeAddFriend);
+    }
+
+    @Override
+    public void removeTempFriend(int id, int status) {
+        friendRepositoryImpl.removeTempFriend(id, status);
     }
 
 }

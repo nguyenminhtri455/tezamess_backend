@@ -106,12 +106,18 @@ public class UserServiceImpl implements UserService {
         if (userResponse == null) {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("login.error"), new Date()), HttpStatus.BAD_REQUEST);
         }
+        Map<String, Object> convertToMapWithRooms = MappedUserModel.convertToMapWithRooms(userResponse);
+
+        List<UserModel> listUserSentRequestAddFriend = friendRepository.getUserSentRequestAddFriend(userResponse.getId());
+        List<Map<String, Object>> convertToListBy5Record = MappedUserModel.convertToListBy5Record(listUserSentRequestAddFriend);
+
+        convertToMapWithRooms.put("request", convertToListBy5Record);
 
         // tao header tra ve token va account info
         HttpHeaders httpHeaders = new HttpHeaders();
         String token = jwtService.generateTokenLogin(userResponse.getPhone());
         httpHeaders.add("token", token);
-        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMapWithRooms(userResponse), Status.SUCCESS.name(), new Date()));
+        return ResponseEntity.ok().headers(httpHeaders).body(new ResultModelV2(Status.SUCCESS.getStatus(), convertToMapWithRooms, Status.SUCCESS.name(), new Date()));
     }
 
     @Override
@@ -328,6 +334,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void notifyOnlineToRoomAndFriend(int userId) {
+        //thong bao online den ban be
         List<UserModel> friends = friendRepository.getFriends(userId);
         Map<String, Object> mapFriend = new HashMap<>();
         mapFriend.put("createdate", new Date().getTime());
@@ -340,19 +347,56 @@ public class UserServiceImpl implements UserService {
             messagingTemplate.convertAndSend("/room/user/" + t.getId(), mapFriend);
         });
 
-        //-------------------------------
-        
+        //thong bao online den cac room co tham gia
         UserModel user = userRepositoryImpl.findUserByIdWithRoom(userId);
-
-        Map<String, Object> mapRoom = new HashMap<>();    
+        Map<String, Object> mapRoom = new HashMap<>();
         mapRoom.put("createdate", new Date().getTime());
         mapRoom.put("body", "Online");
         mapRoom.put("user", userId);
         mapRoom.put("type", "Notify");
-        mapRoom.put("status", "Online");      
+        mapRoom.put("status", "Online");
         user.getRoomModelList().stream().forEach(t -> {
             mapRoom.put("room", t.getId());
             messagingTemplate.convertAndSend("/room/" + t.getId(), mapRoom);
         });
+
+    }
+
+    @Override
+    public ResponseEntity<Object> changePassword(String token, String json) {
+//        UserModel user;
+//        try {
+//            //kiem tra input data khac null
+//            if (json == null) {
+//                throw new IOException();
+//            }
+//            System.out.println(json);
+//            JSONObject jsonObject = new JSONObject(json);
+//
+//            //convert input data thanh UserModel
+//            ObjectMapper mapper = new ObjectMapper();
+//            user = mapper.readValue(jsonObject.toString(), UserModel.class);
+//
+//            //kiem tra phone number co trung voi phone number cua token khong
+//            if (!jwtService.getPhoneFromToken(token).equals(user.getPhone())) {
+//                return new ResponseEntity<>(new ResultModelV2(Status.ERROR_AUTHORICATION.getStatus(), null, environment.getProperty("error.denied"), new Date()), HttpStatus.UNAUTHORIZED);
+//            }
+//
+//        } catch (IOException | JSONException ex) {
+//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
+//        } catch (InvalidateException ex) {
+//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_VALIDATE.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
+//        } catch (Exception ex) {
+//            System.out.println(ex.toString());
+//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+//        }
+//
+//        UserModel userModel = userRepositoryImpl.updateUser(user);
+//        //neu userModel la null thi tai khoan khong ton tai
+//        if (userModel == null) {
+//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
+//        }
+//        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    return null;
     }
 }
