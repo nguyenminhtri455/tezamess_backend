@@ -82,10 +82,15 @@ public class MainController implements ErrorController {
     public ResponseEntity<Object> updateInfoUser(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.updateUser(token, json);
     }
-    
+
     @PutMapping("tezamess/api/change-password")
     public ResponseEntity<Object> changePassword(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
-        return userServiceImpl.updateUser(token, json);
+        return userServiceImpl.changePassword(token, json);
+    }
+    
+    @PutMapping("tezamess/api/update-email")
+    public ResponseEntity<Object> updateEmail(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
+        return userServiceImpl.updateEmail(token, json);
     }
 
     @PostMapping("tezamess/api/get-friends")
@@ -98,10 +103,8 @@ public class MainController implements ErrorController {
     FriendRepositoryImpl friendRepositoryImpl;
 
     @GetMapping("/tezamess/api-test")
-    public ResponseEntity<Object> testAPI(@RequestBody(required = false) String json) {
-        System.out.println(json);
-        List<UserModel> requestAddFriend = friendRepositoryImpl.getRequestAddFriend(194);
-        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMapBy4Record(requestAddFriend.get(0)), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    public ResponseEntity<Object> testAPI(@RequestBody(required = false) String json, @RequestHeader(value = "authorization") String token) {
+        return userServiceImpl.changePassword(token, json);
 
     }
 

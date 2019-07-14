@@ -23,6 +23,8 @@ public interface UserService {
 
     ResponseEntity<Object> changePassword(String token, String json);
 
+    ResponseEntity<Object> updateEmail(String token, String json);
+
     ResponseEntity<Object> findUserByPhone(String token, String json);
 
     ResponseEntity<Object> userUsingApp(String token, String json);

@@ -27,13 +27,11 @@ public class RoomRepositoryImpl implements RoomRepository {
         System.out.println(listId.size());
         Session session = sessionFactory.getCurrentSession();
         RoomModel room = new RoomModel();
-        if (listId.size() > 2) {
+        if (!name.isEmpty()) {
+            room.setName(name);
             room.setTypeRoomModel(new TypeRoomModel("G"));
         } else {
             room.setTypeRoomModel(new TypeRoomModel("D"));
-        }
-        if (name != null) {
-            room.setName(name);
         }
         if (idCreateUser != -1) {
 //            UserModel get = session.get(UserModel.class, idCreateUser);

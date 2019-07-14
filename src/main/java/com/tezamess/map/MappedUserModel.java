@@ -65,7 +65,6 @@ public class MappedUserModel {
             map2.put("lastactive", t.getLastactive().getTime());
             list.add(map2);
         });
-        System.out.println(list.size() + " kich thuoc");
         return list;
     }
 

@@ -364,39 +364,75 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<Object> changePassword(String token, String json) {
-//        UserModel user;
-//        try {
-//            //kiem tra input data khac null
-//            if (json == null) {
-//                throw new IOException();
-//            }
-//            System.out.println(json);
-//            JSONObject jsonObject = new JSONObject(json);
-//
-//            //convert input data thanh UserModel
-//            ObjectMapper mapper = new ObjectMapper();
-//            user = mapper.readValue(jsonObject.toString(), UserModel.class);
-//
-//            //kiem tra phone number co trung voi phone number cua token khong
-//            if (!jwtService.getPhoneFromToken(token).equals(user.getPhone())) {
-//                return new ResponseEntity<>(new ResultModelV2(Status.ERROR_AUTHORICATION.getStatus(), null, environment.getProperty("error.denied"), new Date()), HttpStatus.UNAUTHORIZED);
-//            }
-//
-//        } catch (IOException | JSONException ex) {
-//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
-//        } catch (InvalidateException ex) {
-//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_VALIDATE.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
-//        } catch (Exception ex) {
-//            System.out.println(ex.toString());
-//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//
-//        UserModel userModel = userRepositoryImpl.updateUser(user);
-//        //neu userModel la null thi tai khoan khong ton tai
-//        if (userModel == null) {
-//            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
-//        }
-//        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
-    return null;
+        UserModel user;
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+            System.out.println(json);
+            JSONObject jsonObject = new JSONObject(json);
+
+            //convert input data thanh UserModel
+            ObjectMapper mapper = new ObjectMapper();
+            user = mapper.readValue(jsonObject.toString(), UserModel.class);
+
+            //kiem tra phone number co trung voi phone number cua token khong
+            if (!jwtService.getPhoneFromToken(token).equals(user.getPhone())) {
+                return new ResponseEntity<>(new ResultModelV2(Status.ERROR_AUTHORICATION.getStatus(), null, environment.getProperty("error.denied"), new Date()), HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (IOException | JSONException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (InvalidateException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_VALIDATE.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        UserModel userModel = userRepositoryImpl.changePassword(user);
+        //neu userModel la null thi tai khoan khong ton tai
+        if (userModel == null) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> updateEmail(String token, String json) {
+        UserModel user;
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+            System.out.println(json);
+            JSONObject jsonObject = new JSONObject(json);
+
+            //convert input data thanh UserModel
+            ObjectMapper mapper = new ObjectMapper();
+            user = mapper.readValue(jsonObject.toString(), UserModel.class);
+
+            //kiem tra phone number co trung voi phone number cua token khong
+            if (!jwtService.getPhoneFromToken(token).equals(user.getPhone())) {
+                return new ResponseEntity<>(new ResultModelV2(Status.ERROR_AUTHORICATION.getStatus(), null, environment.getProperty("error.denied"), new Date()), HttpStatus.UNAUTHORIZED);
+            }
+
+        } catch (IOException | JSONException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (InvalidateException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_VALIDATE.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        UserModel userModel = userRepositoryImpl.updateEmail(user);
+        //neu userModel la null thi tai khoan khong ton tai
+        if (userModel == null) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
     }
 }

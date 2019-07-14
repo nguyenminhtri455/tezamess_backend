@@ -15,6 +15,8 @@ public interface UserRepository {
 
     UserModel changePassword(UserModel user);
 
+    UserModel updateEmail(UserModel user);
+
     UserModel findUserById(int id);
 
     UserModel findUserByIdWithRoom(int id);

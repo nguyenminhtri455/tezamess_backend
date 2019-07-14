@@ -88,12 +88,19 @@ public class UserRepositoryImpl implements UserRepository {
         Session session = sessionFactory.getCurrentSession();
         UserModel userModel = findUserByPhone(user.getPhone());
         if (userModel != null) {
-            userModel.setName(user.getName());
-            userModel.setGender(user.getGender());
-            userModel.setBirthday(user.getBirthday());
-            if (user.getUrlavatar() != null) {
-                userModel.setUrlavatar(user.getUrlavatar());
-            }
+            String passwordEncryption = Base64.getEncoder().encodeToString(user.getPassword().getBytes());
+            userModel.setPassword(passwordEncryption);
+            return userModel;
+        }
+        return null;
+    }
+
+    @Override
+    public UserModel updateEmail(UserModel user) {
+        Session session = sessionFactory.getCurrentSession();
+        UserModel userModel = findUserByPhone(user.getPhone());
+        if (userModel != null) {          
+            userModel.setEmail(user.getEmail());
             return userModel;
         }
         return null;

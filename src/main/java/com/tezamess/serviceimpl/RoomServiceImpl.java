@@ -32,20 +32,29 @@ public class RoomServiceImpl implements RoomService {
             List<Integer> listId;
             if (jSONArray.length() > 0) {
                 listId = new ArrayList<>();
-                String nameRoom = jSONObject.getString("name");
+                String nameRoom = jSONObject.getString("name").trim();
                 int creatorId = jSONObject.getInt("creator");
                 listId.add(creatorId);
                 for (int i = 0; i < jSONArray.length(); i++) {
                     listId.add(jSONArray.getInt(i));
                 }
-                room = roomRepositoryImpl.findRoom(listId);
-                if (room != null) {
-                    return room;
+                if (!nameRoom.isEmpty()) {
+                    room = roomRepositoryImpl.
+                            createRoom(nameRoom,
+                                    creatorId,
+                                    listId);
+                } else {
+                    room = roomRepositoryImpl.findRoom(listId);
+                    if (room != null) {
+                        return room;
+                    }
+
+                    room = roomRepositoryImpl.
+                            createRoom(nameRoom,
+                                    creatorId,
+                                    listId);
                 }
-                room = roomRepositoryImpl.
-                        createRoom(nameRoom,
-                                creatorId,
-                                listId);
+
             }
             return room;
         } catch (IOException | JSONException ex) {
