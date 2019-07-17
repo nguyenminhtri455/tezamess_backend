@@ -20,13 +20,20 @@ public class FriendModel implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "useridrequest", updatable = false)
-    private UserModel useridrequest;
+    private UserModel userRequest;
 
     @JoinColumn(name = "useridfriend", updatable = false)
-    @ManyToOne(fetch = FetchType.LAZY)
-    private UserModel useridfriend;
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserModel userFriend;
+
+    //status = 0 (da gui yeu cau ket ban)
+    //status = 1 (da dong y yeu cau ket ban nhung nguoi yeu cau chua nhan duoc)
+    //status = -1 (khong dong y yeu cau ket ban nhung nguoi yeu cau chua nhan duoc)
+    //status = 2 (da la ban be)
+    @Column(name = "status")
+    private Integer status;
 
     public FriendModel() {
     }
@@ -43,20 +50,28 @@ public class FriendModel implements Serializable {
         this.id = id;
     }
 
-    public UserModel getUseridrequest() {
-        return useridrequest;
+    public UserModel getUserRequest() {
+        return userRequest;
     }
 
-    public void setUseridrequest(UserModel useridrequest) {
-        this.useridrequest = useridrequest;
+    public void setUserRequest(UserModel userRequest) {
+        this.userRequest = userRequest;
     }
 
-    public UserModel getUseridfriend() {
-        return useridfriend;
+    public UserModel getUserFriend() {
+        return userFriend;
     }
 
-    public void setUseridfriend(UserModel useridfriend) {
-        this.useridfriend = useridfriend;
+    public void setUserFriend(UserModel userFriend) {
+        this.userFriend = userFriend;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     @Override

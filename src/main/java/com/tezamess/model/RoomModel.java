@@ -24,13 +24,15 @@ public class RoomModel implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "room", fetch = FetchType.LAZY)
     private Set<MessageModel> messageList;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(name = "participation",
-            joinColumns = {
-                @JoinColumn(name = "groupid")},
-            inverseJoinColumns = {
-                @JoinColumn(name = "userid")})
-    private Set<UserModel> userModelList = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @JoinTable(name = "participation",
+//            joinColumns = {
+//                @JoinColumn(name = "groupid")},
+//            inverseJoinColumns = {
+//                @JoinColumn(name = "userid")})
+//    private Set<UserModel> userModelList = new HashSet<>();
+    @OneToMany(mappedBy = "room", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<ParticipationModel> participationModels = new HashSet();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,20 +88,25 @@ public class RoomModel implements Serializable {
     public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
-    
-    
 
     @Override
     public String toString() {
         return "com.tezamess.model.Room[ id=" + id + " ]";
     }
 
-    public Set<UserModel> getUserModelList() {
-        return userModelList;
+//    public Set<UserModel> getUserModelList() {
+//        return userModelList;
+//    }
+//
+//    public void setUserModelList(Set<UserModel> userModelList) {
+//        this.userModelList = userModelList;
+//    }
+    public Set<ParticipationModel> getParticipationModels() {
+        return participationModels;
     }
 
-    public void setUserModelList(Set<UserModel> userModelList) {
-        this.userModelList = userModelList;
+    public void setParticipationModels(Set<ParticipationModel> participationModels) {
+        this.participationModels = participationModels;
     }
 
     public String getName() {

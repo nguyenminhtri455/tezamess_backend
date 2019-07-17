@@ -91,8 +91,8 @@ public class FriendServiceImpl implements FriendService {
     }
 
     @Override
-    public void removeTempFriend(int id, int status) {
-        friendRepositoryImpl.removeTempFriend(id, status);
+    public void updateOrDeleteStatusAddFriend(int id, int status) {
+        friendRepositoryImpl.updateOrDeleteStatusAddFriend(id, status);
     }
 
 }

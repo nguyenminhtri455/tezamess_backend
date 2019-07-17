@@ -17,7 +17,7 @@ public interface FriendRepository {
     
     List<UserModel> getResponseAddFriend(int idUserRequest);
     
-    void removeTempFriend(int id, int status);
+    void updateOrDeleteStatusAddFriend(int id, int status);
 
     List<UserModel> getUserSentRequestAddFriend(Integer id);
     

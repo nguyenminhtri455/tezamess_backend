@@ -1,11 +1,13 @@
 package com.tezamess.serviceimpl;
 
+import com.tezamess.map.MappedRoomModel;
 import com.tezamess.model.RoomModel;
 import com.tezamess.repositoryimpl.RoomRepositoryImpl;
 import com.tezamess.service.RoomService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -70,5 +72,16 @@ public class RoomServiceImpl implements RoomService {
     public RoomModel findRoom(int idRoom) {
         RoomModel room = roomRepositoryImpl.findRoom(idRoom);
         return room;
+    }
+
+    @Override
+    public void changeStatusReceivedRoom(int id, int idRoom) {
+        roomRepositoryImpl.changeStatusReceivedRoom(id, idRoom);
+    }
+
+    @Override
+    public List<Map<String, Object>> getRoomNotReceived(int id) {
+        List<Map<String, Object>> convertToMap = MappedRoomModel.convertToMap(roomRepositoryImpl.getRoomNotReceived(id));
+        return convertToMap;
     }
 }

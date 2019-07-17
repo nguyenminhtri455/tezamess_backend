@@ -3,6 +3,7 @@ package com.tezamess.map;
 import com.tezamess.model.MessageModel;
 import com.tezamess.model.UserModel;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ public class MappedUserModel {
         map.put("id", user.getId());
         map.put("phone", user.getPhone());
         map.put("name", user.getName());
+        user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
         map.put("password", user.getPassword());
         map.put("birthday", user.getBirthday());
         map.put("gender", user.getGender());
@@ -73,6 +75,7 @@ public class MappedUserModel {
         map.put("id", user.getId());
         map.put("phone", user.getPhone());
         map.put("name", user.getName());
+        user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
         map.put("password", user.getPassword());
         map.put("birthday", user.getBirthday());
         map.put("email", user.getEmail());
@@ -80,19 +83,49 @@ public class MappedUserModel {
         map.put("urlavatar", user.getUrlavatar());
         map.put("lastactive", user.getLastactive());
         List<Map<String, Object>> rooms = new ArrayList<>();
-        user.getRoomModelList().stream()
+//        user.getRoomModelList().stream()
+//                .forEach(t -> {
+//                    Map<String, Object> m = new HashMap<>();
+//                    m.put("id", t.getId());
+//                    m.put("creator", t.getCreator().getId());
+//                    m.put("name", t.getName());
+//                    m.put("type", t.getTypeRoomModel().getId());
+//                    m.put("size", t.getUserModelList().size());
+////                    if (t.getTypeRoomModel().getId().equals("D")) {
+//                    //Danh sach thanh vien trong phong
+//                    List<Map<String, Object>> members = new ArrayList<>();
+//                    t.getUserModelList().stream().forEach(s -> {
+//                        Map<String, Object> member = convertToMapBy4Record(s);
+//                        members.add(member);
+//                    });
+//                    m.put("members", members);
+////                    }
+//                    rooms.add(m);
+//
+//                    //Danh sach tin nhan trong phong
+//                    List<Map<String, Object>> messages = new ArrayList<>();
+//                    t.getMessageList().stream()
+//                            .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
+//                            //                            .sorted(Comparator.comparingInt(MessageModel::getId).reversed())
+//                            .forEach(a -> {
+//                                Map<String, Object> message = MappedMessageModel.convertMessageChat(a);
+//                                messages.add(message);
+//                            });
+//                    m.put("messages", messages);
+//                });
+        user.getParticipationModels().stream()
                 .forEach(t -> {
                     Map<String, Object> m = new HashMap<>();
-                    m.put("id", t.getId());
-                    m.put("creator", t.getCreator().getId());
-                    m.put("name", t.getName());
-                    m.put("type", t.getTypeRoomModel().getId());
-                    m.put("size", t.getUserModelList().size());
+                    m.put("id", t.getRoom().getId());
+                    m.put("creator", t.getRoom().getCreator().getId());
+                    m.put("name", t.getRoom().getName());
+                    m.put("type", t.getRoom().getTypeRoomModel().getId());
+                    m.put("size", t.getRoom().getParticipationModels().size());
 //                    if (t.getTypeRoomModel().getId().equals("D")) {
                     //Danh sach thanh vien trong phong
                     List<Map<String, Object>> members = new ArrayList<>();
-                    t.getUserModelList().stream().forEach(s -> {
-                        Map<String, Object> member = convertToMapBy4Record(s);
+                    t.getRoom().getParticipationModels().stream().forEach(s -> {
+                        Map<String, Object> member = convertToMapBy4Record(s.getUser());
                         members.add(member);
                     });
                     m.put("members", members);
@@ -101,7 +134,7 @@ public class MappedUserModel {
 
                     //Danh sach tin nhan trong phong
                     List<Map<String, Object>> messages = new ArrayList<>();
-                    t.getMessageList().stream()
+                    t.getRoom().getMessageList().stream()
                             .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
                             //                            .sorted(Comparator.comparingInt(MessageModel::getId).reversed())
                             .forEach(a -> {

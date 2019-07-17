@@ -12,4 +12,8 @@ public interface RoomRepository {
     RoomModel findRoom(int id);
 
     RoomModel findRoom(List<Integer> listId);
+
+    void changeStatusReceivedRoom(int id, int idRoom);
+
+    List<RoomModel> getRoomNotReceived(int id);
 }

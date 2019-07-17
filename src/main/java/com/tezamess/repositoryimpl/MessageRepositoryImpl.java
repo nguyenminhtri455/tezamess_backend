@@ -44,17 +44,33 @@ public class MessageRepositoryImpl implements MessageRepository {
             Query<RoomModel> query1 = ss.createQuery("FROM RoomModel as r WHERE r.id = :id", RoomModel.class);
             query1.setParameter("id", message.getRoomid().getId());
             RoomModel room = query1.getSingleResult();
-            room.getUserModelList().stream().forEach(t -> {
+//            room.getUserModelList().stream().forEach(t -> {
+//                TempMessageModel tempMessageModel = new TempMessageModel();
+//
+//                if (Objects.equals(t.getId(), message.getUserid().getId())) {
+//                    tempMessageModel.setStatusMessage(0);
+//                } else {
+//                    tempMessageModel.setStatusMessage(-1);
+//                }
+//                tempMessageModel.setIdmessage(message);
+//
+//                tempMessageModel.setIdmember(t);
+//                tempMessageModel.setIdRoom(message.getRoomid());
+//                ss.save(tempMessageModel);
+//            });
+
+//---------------------------
+            room.getParticipationModels().stream().forEach(t -> {
                 TempMessageModel tempMessageModel = new TempMessageModel();
 
-                if (Objects.equals(t.getId(), message.getUserid().getId())) {
+                if (Objects.equals(t.getUser().getId(), message.getUserid().getId())) {
                     tempMessageModel.setStatusMessage(0);
                 } else {
                     tempMessageModel.setStatusMessage(-1);
                 }
                 tempMessageModel.setIdmessage(message);
 
-                tempMessageModel.setIdmember(t);
+                tempMessageModel.setIdmember(t.getUser());
                 tempMessageModel.setIdRoom(message.getRoomid());
                 ss.save(tempMessageModel);
             });
@@ -71,20 +87,51 @@ public class MessageRepositoryImpl implements MessageRepository {
 
         List<MessageModel> list = new ArrayList<>();
         UserModel resultList = (UserModel) query.getSingleResult();
-        resultList.getRoomModelList().stream().forEach(t -> {
+//        resultList.getRoomModelList().stream().forEach(t -> {
+//            Query query1 = ss.createQuery("FROM MessageModel m WHERE m.room.id = :roomid"
+//                    + " AND m.id BETWEEN"
+//                    + " (SELECT t.idmessage.id FROM TempMessageModel t"
+//                    + " WHERE t.idRoom.id = :roomid AND t.idmember.id = :memberid)"
+//                    + " AND (SELECT MAX(t.idmessage.id) FROM TempMessageModel t"
+//                    + " WHERE t.idRoom.id = :roomid)");
+//            query1.setParameter("roomid", t.getId());
+//            query1.setParameter("memberid", idUser);
+//            List<MessageModel> messages = query1.getResultList();
+//
+//            Query query2 = ss.createQuery("FROM TempMessageModel t"
+//                    + " WHERE t.idmember.id = :idmember"
+//                    + " AND t.idRoom.id = :idRoom", TempMessageModel.class
+//            );
+//
+//            query2.setParameter("idmember", idUser);
+//            query2.setParameter("idRoom", t.getId());
+//            List<TempMessageModel> resultList1 = query2.getResultList();
+//            if (messages.size() == 1) {
+//                if (messages.get(0).getUserid().getId() != idUser
+//                        && resultList1.get(0).getStatusMessage() == -1) {
+//                    list.addAll(messages);
+//                }
+//            } else {
+//                if (messages.size() > 0) {
+//                    if (resultList1.get(0).getStatusMessage() == -1) {
+//                        list.addAll(messages);
+//                    } else {
+//                        messages.remove(0);
+//                        list.addAll(messages);
+//                    }
+//                }
+//            }
+//        });
+
+//----------------------------
+        resultList.getParticipationModels().stream().forEach(t -> {
             Query query1 = ss.createQuery("FROM MessageModel m WHERE m.room.id = :roomid"
                     + " AND m.id BETWEEN"
                     + " (SELECT t.idmessage.id FROM TempMessageModel t"
                     + " WHERE t.idRoom.id = :roomid AND t.idmember.id = :memberid)"
                     + " AND (SELECT MAX(t.idmessage.id) FROM TempMessageModel t"
                     + " WHERE t.idRoom.id = :roomid)");
-//            Query query1 = ss.createSQLQuery("SELECT * FROM message m WHERE m.groupid = :roomid"
-//                    + " AND m.id BETWEEN"
-//                    + " (SELECT t.idmessage FROM tempmessage t"
-//                    + " WHERE t.roomid = :roomid AND t.idmember = :memberid)"
-//                    + " AND (SELECT MAX(t.idmessage) FROM tempmessage t"
-//                    + " WHERE t.roomid = :roomid)");          
-            query1.setParameter("roomid", t.getId());
+            query1.setParameter("roomid", t.getRoom().getId());
             query1.setParameter("memberid", idUser);
             List<MessageModel> messages = query1.getResultList();
 
@@ -94,10 +141,11 @@ public class MessageRepositoryImpl implements MessageRepository {
             );
 
             query2.setParameter("idmember", idUser);
-            query2.setParameter("idRoom", t.getId());
+            query2.setParameter("idRoom", t.getRoom().getId());
             List<TempMessageModel> resultList1 = query2.getResultList();
             if (messages.size() == 1) {
-                if (messages.get(0).getUserid().getId() != idUser && resultList1.get(0).getStatusMessage() == -1) {
+                if (messages.get(0).getUserid().getId() != idUser
+                        && resultList1.get(0).getStatusMessage() == -1) {
                     list.addAll(messages);
                 }
             } else {
@@ -110,7 +158,6 @@ public class MessageRepositoryImpl implements MessageRepository {
                     }
                 }
             }
-
         });
 
         return list;
@@ -130,8 +177,8 @@ public class MessageRepositoryImpl implements MessageRepository {
         TempMessageModel tempMessage = query.getSingleResult();
         if (tempMessage != null) {
 
-            if (tempMessage.getStatusMessage() == 2 && 
-                    Objects.equals(tempMessage.getIdmessage().getId(), tempMessageModel.getIdmessage().getId())) {
+            if (tempMessage.getStatusMessage() == 2
+                    && Objects.equals(tempMessage.getIdmessage().getId(), tempMessageModel.getIdmessage().getId())) {
                 return 2;
             }
 

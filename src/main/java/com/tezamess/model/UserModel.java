@@ -14,6 +14,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -22,13 +23,17 @@ import javax.persistence.TemporalType;
 @Table(name = "member")
 public class UserModel implements Serializable {
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "participation",
-            joinColumns = {
-                @JoinColumn(name = "userid")},
-            inverseJoinColumns = {
-                @JoinColumn(name = "groupid")})
-    private Set<RoomModel> roomModelList = new HashSet<>();
+//    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JoinTable(name = "participation",
+//            joinColumns = {
+//                @JoinColumn(name = "userid")},
+//            inverseJoinColumns = {
+//                @JoinColumn(name = "groupid")})
+//    private Set<RoomModel> roomModelList = new HashSet<>();
+    
+    //----------------------------------
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Set<ParticipationModel> participationModels = new HashSet();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -145,12 +150,19 @@ public class UserModel implements Serializable {
         return "com.appchat.model.UserModel[ id=" + id + " ]";
     }
 
-    public Set<RoomModel> getRoomModelList() {
-        return roomModelList;
+//    public Set<RoomModel> getRoomModelList() {
+//        return roomModelList;
+//    }
+//
+//    public void setRoomModelList(Set<RoomModel> roomModelList) {
+//        this.roomModelList = roomModelList;
+//    }
+    public Set<ParticipationModel> getParticipationModels() {
+        return participationModels;
     }
 
-    public void setRoomModelList(Set<RoomModel> roomModelList) {
-        this.roomModelList = roomModelList;
+    public void setParticipationModels(Set<ParticipationModel> participationModels) {
+        this.participationModels = participationModels;
     }
 
 }

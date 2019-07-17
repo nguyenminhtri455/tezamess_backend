@@ -355,9 +355,15 @@ public class UserServiceImpl implements UserService {
         mapRoom.put("user", userId);
         mapRoom.put("type", "Notify");
         mapRoom.put("status", "Online");
-        user.getRoomModelList().stream().forEach(t -> {
-            mapRoom.put("room", t.getId());
-            messagingTemplate.convertAndSend("/room/" + t.getId(), mapRoom);
+//        user.getRoomModelList().stream().forEach(t -> {
+//            mapRoom.put("room", t.getId());
+//            messagingTemplate.convertAndSend("/room/" + t.getId(), mapRoom);
+//        });
+
+//------------------------------------
+        user.getParticipationModels().stream().forEach(t -> {
+            mapRoom.put("room", t.getRoom().getId());
+            messagingTemplate.convertAndSend("/room/" + t.getRoom().getId(), mapRoom);
         });
 
     }

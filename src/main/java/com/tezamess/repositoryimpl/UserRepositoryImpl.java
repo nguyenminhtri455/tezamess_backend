@@ -1,6 +1,7 @@
 package com.tezamess.repositoryimpl;
 
 import com.tezamess.model.MessageModel;
+import com.tezamess.model.ParticipationModel;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.repository.UserRepository;
@@ -37,15 +38,29 @@ public class UserRepositoryImpl implements UserRepository {
         query.setParameter("phone", userModel.getPhone());
         query.setParameter("password", userModel.getPassword());
         List<UserModel> resultList = query.getResultList();
+//        if (resultList.size() > 0) {
+//            int size = resultList.get(0).getRoomModelList().size();
+//            for (RoomModel room : resultList.get(0).getRoomModelList()) {
+//                Query query1 = session.createQuery("FROM MessageModel as m WHERE m.room.id = :idRoom ORDER BY m.id DESC");
+//                query1.setFirstResult(0);
+//                query1.setMaxResults(50);
+//                query1.setParameter("idRoom", room.getId());
+//                List<MessageModel> resultList1 = query1.getResultList();
+//                room.setMessageList(new HashSet<>(resultList1));
+//            }
+//            return resultList.get(0);
+//        }
+
+//----------------------------------
         if (resultList.size() > 0) {
-            int size = resultList.get(0).getRoomModelList().size();
-            for (RoomModel room : resultList.get(0).getRoomModelList()) {
+            int size = resultList.get(0).getParticipationModels().size();
+            for (ParticipationModel participationModel : resultList.get(0).getParticipationModels()) {
                 Query query1 = session.createQuery("FROM MessageModel as m WHERE m.room.id = :idRoom ORDER BY m.id DESC");
                 query1.setFirstResult(0);
                 query1.setMaxResults(50);
-                query1.setParameter("idRoom", room.getId());
+                query1.setParameter("idRoom", participationModel.getRoom().getId());
                 List<MessageModel> resultList1 = query1.getResultList();
-                room.setMessageList(new HashSet<>(resultList1));
+                participationModel.getRoom().setMessageList(new HashSet<>(resultList1));
             }
             return resultList.get(0);
         }
@@ -99,7 +114,7 @@ public class UserRepositoryImpl implements UserRepository {
     public UserModel updateEmail(UserModel user) {
         Session session = sessionFactory.getCurrentSession();
         UserModel userModel = findUserByPhone(user.getPhone());
-        if (userModel != null) {          
+        if (userModel != null) {
             userModel.setEmail(user.getEmail());
             return userModel;
         }
@@ -170,8 +185,13 @@ public class UserRepositoryImpl implements UserRepository {
     public UserModel findUserByIdWithRoom(int id) {
         Session session = sessionFactory.getCurrentSession();
         UserModel user = session.get(UserModel.class, id);
+//        if (user != null) {
+//            user.getRoomModelList().size();
+//            return user;
+//        }
+//-----------------------------
         if (user != null) {
-            user.getRoomModelList().size();
+            user.getParticipationModels().size();
             return user;
         }
         return null;

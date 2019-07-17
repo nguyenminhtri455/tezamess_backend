@@ -18,5 +18,5 @@ public interface FriendService {
 
     List<Map<String, Object>> getDisAgreeResponseAddFriend(int idUserRequest);
 
-    void removeTempFriend(int id, int status);
+    void updateOrDeleteStatusAddFriend(int id, int status);
 }

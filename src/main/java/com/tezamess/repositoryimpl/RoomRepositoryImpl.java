@@ -1,9 +1,11 @@
 package com.tezamess.repositoryimpl;
 
+import com.tezamess.model.ParticipationModel;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.TypeRoomModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.repository.RoomRepository;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,7 +26,29 @@ public class RoomRepositoryImpl implements RoomRepository {
 
     @Override
     public RoomModel createRoom(String name, int idCreateUser, List<Integer> listId) {
-        System.out.println(listId.size());
+//        Session session = sessionFactory.getCurrentSession();
+//        RoomModel room = new RoomModel();
+//        if (!name.isEmpty()) {
+//            room.setName(name);
+//            room.setTypeRoomModel(new TypeRoomModel("G"));
+//        } else {
+//            room.setTypeRoomModel(new TypeRoomModel("D"));
+//        }
+//        if (idCreateUser != -1) {
+//            room.setCreator(new UserModel(idCreateUser));
+//        }
+//
+//        session.save(room);
+//
+//        Query query = session.createQuery("From UserModel WHERE id IN :ids", UserModel.class);
+//
+//        query.setParameterList("ids", listId);
+//        List<UserModel> resultList = query.getResultList();
+//        Set<UserModel> set = new HashSet<UserModel>(resultList);
+//        room.setUserModelList(set);
+//        return room;
+
+//-------------------------------------------------
         Session session = sessionFactory.getCurrentSession();
         RoomModel room = new RoomModel();
         if (!name.isEmpty()) {
@@ -34,7 +58,6 @@ public class RoomRepositoryImpl implements RoomRepository {
             room.setTypeRoomModel(new TypeRoomModel("D"));
         }
         if (idCreateUser != -1) {
-//            UserModel get = session.get(UserModel.class, idCreateUser);
             room.setCreator(new UserModel(idCreateUser));
         }
 
@@ -44,8 +67,24 @@ public class RoomRepositoryImpl implements RoomRepository {
 
         query.setParameterList("ids", listId);
         List<UserModel> resultList = query.getResultList();
-        Set<UserModel> set = new HashSet<UserModel>(resultList);
-        room.setUserModelList(set);
+
+        List<ParticipationModel> participationModels = new ArrayList();
+        resultList.stream().forEach(t -> {
+
+            ParticipationModel participationModel = new ParticipationModel();
+            participationModel.setRoom(room);
+            participationModel.setUser(t);
+            if (t.getId() == idCreateUser) {
+                participationModel.setStatus(1);
+            } else {
+                participationModel.setStatus(0);
+            }
+            participationModels.add(participationModel);
+            session.save(participationModel);
+        });
+        Set<ParticipationModel> set = new HashSet<>(participationModels);
+
+        room.setParticipationModels(set);
         return room;
     }
 
@@ -67,20 +106,28 @@ public class RoomRepositoryImpl implements RoomRepository {
 
     @Override
     public RoomModel findRoom(List<Integer> listId) {
-        Session session = sessionFactory.getCurrentSession();
-
-//        Query query = session.createSQLQuery("SELECT * FROM "
-//                + " participation WHERE groupid IN (SELECT DISTINCT p.groupid FROM room,member,participation as p"
-//                + " WHERE p.userid = member.id AND p.groupid = room.id AND p.userid IN :ids)"
-//                + " GROUP BY groupid"
+//        Session session = sessionFactory.getCurrentSession();
+//        Query query = session.createSQLQuery("SELECT * FROM participation as p"
+//                + " WHERE p.userid IN :ids"
+//                + " GROUP BY p.groupid"
 //                + " HAVING COUNT(*) = :size");
-//        Query query = session.createQuery("FROM RoomModel as d"
-//                + " WHERE d.id IN (SELECT DISTINCT r.id FROM RoomModel r JOIN r.userModelList e"
-//                + " WHERE e.id IN :ids)"
-//                + " GROUP BY d.id", RoomModel.class);
-//        Query query = session.createQuery("FROM RoomModel r JOIN r.userModelList e"
-//                + " WHERE e.id IN :ids"
-//                + " GROUP BY r");
+//        query.setParameterList("ids", listId);
+//        query.setParameter("size", listId.size());
+//        List<Object[]> resultList = query.getResultList();
+//        for (Object[] o : resultList) {
+//            RoomModel room = session.get(RoomModel.class, (int) o[0]);
+//            List<Integer> collect = room.getUserModelList().stream()
+//                    .map(UserModel::getId)
+//                    .collect(Collectors.toList());
+//            collect.removeAll(listId);
+//            if (collect.size() == 0) {
+//                return room;
+//            }
+//        };
+//        return null;
+
+//-------------------------------------------------
+        Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery("SELECT * FROM participation as p"
                 + " WHERE p.userid IN :ids"
                 + " GROUP BY p.groupid"
@@ -90,14 +137,38 @@ public class RoomRepositoryImpl implements RoomRepository {
         List<Object[]> resultList = query.getResultList();
         for (Object[] o : resultList) {
             RoomModel room = session.get(RoomModel.class, (int) o[0]);
-            List<Integer> collect = room.getUserModelList().stream()
-                    .map(UserModel::getId)
+            List<Integer> collect = room.getParticipationModels().stream()
+                    .map((participation) -> participation.getUser().getId())
                     .collect(Collectors.toList());
             collect.removeAll(listId);
-            if (collect.size() == 0) {
+            if (collect.isEmpty()) {
                 return room;
             }
         };
         return null;
+    }
+
+    @Override
+    public void changeStatusReceivedRoom(int id, int idRoom) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM ParticipationModel p"
+                + " WHERE p.room.id = :idRoom"
+                + " AND p.user.id = :id", ParticipationModel.class);
+        query.setParameter("idRoom", idRoom);
+        query.setParameter("id", id);
+        ParticipationModel singleResult = (ParticipationModel) query.getSingleResult();
+        singleResult.setStatus(1);
+    }
+
+    @Override
+    public List<RoomModel> getRoomNotReceived(int id) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("SELECT p.room FROM ParticipationModel p"
+                + " WHERE p.user.id = :id"
+                + " AND p.status = :status", RoomModel.class);
+        query.setParameter("id", id);
+        query.setParameter("status", 0);
+        List<RoomModel> rooms = query.getResultList();        
+        return rooms;
     }
 }

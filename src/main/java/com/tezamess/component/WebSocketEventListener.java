@@ -53,9 +53,15 @@ public class WebSocketEventListener {
             userRepositoryImpl.updateLastActive(id);
 
             UserModel user = userRepositoryImpl.findUserByIdWithRoom(id);
-            user.getRoomModelList().stream().forEach(t -> {
-                map.put("room", t.getId());
-                messagingTemplate.convertAndSend("/room/" + t.getId(), map);
+//            user.getRoomModelList().stream().forEach(t -> {
+//                map.put("room", t.getId());
+//                messagingTemplate.convertAndSend("/room/" + t.getId(), map);
+//            });
+
+//-------------------
+            user.getParticipationModels().stream().forEach(t -> {
+                map.put("room", t.getRoom().getId());
+                messagingTemplate.convertAndSend("/room/" + t.getRoom().getId(), map);
             });
 
             Map<String, Object> mapFriend = new HashMap<>();

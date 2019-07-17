@@ -1,10 +1,10 @@
 package com.tezamess.repositoryimpl;
 
 import com.tezamess.model.FriendModel;
-import com.tezamess.model.TempFriendModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.repository.FriendRepository;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -26,18 +26,20 @@ public class FriendRepositoryImpl implements FriendRepository {
         Session session = sessionFactory.getCurrentSession();
 
         Query query = session.createQuery("FROM FriendModel as f "
-                + "WHERE f.useridrequest.id = :id "
-                + "OR f.useridfriend.id = :id");
+                + "WHERE f.status IN :status AND (f.userRequest.id = :id "
+                + "OR f.userFriend.id = :id)");
+
+        query.setParameterList("status", Arrays.asList(1, 2));
         query.setParameter("id", idUser);
 
         List<FriendModel> friends = query.getResultList();
 
         friends.stream().forEach(t -> {
-            if (idUser != t.getUseridfriend().getId()) {
-                listUser.add(session.get(UserModel.class, t.getUseridfriend().getId()));
+            if (idUser != t.getUserFriend().getId()) {
+                listUser.add(session.get(UserModel.class, t.getUserFriend().getId()));
             }
-            if (idUser != t.getUseridrequest().getId()) {
-                listUser.add(session.get(UserModel.class, t.getUseridrequest().getId()));
+            if (idUser != t.getUserRequest().getId()) {
+                listUser.add(session.get(UserModel.class, t.getUserRequest().getId()));
             }
         });
         return listUser;
@@ -47,32 +49,33 @@ public class FriendRepositoryImpl implements FriendRepository {
     public void addFriend(int id, int idfriend) {
         Session session = sessionFactory.getCurrentSession();
         //luu ket ban
-        FriendModel friendModel = new FriendModel();
-        friendModel.setUseridrequest(new UserModel(idfriend));
-        friendModel.setUseridfriend(new UserModel(id));
-        session.save(friendModel);
+//        FriendModel friendModel = new FriendModel();
+//        friendModel.setUserRequest(new UserModel(idfriend));
+//        friendModel.setUserFriend(new UserModel(id));
+//        friendModel.setStatus(1);
+//        session.save(friendModel);
 
         //thay doi trang thai ket ban
-        Query query = session.createQuery("FROM TempFriendModel t"
+        Query query = session.createQuery("FROM FriendModel t"
                 + " WHERE t.userFriend.id = :idUserFriend"
-                + " AND t.userRequest.id = :idUserRequest", TempFriendModel.class);
+                + " AND t.userRequest.id = :idUserRequest", FriendModel.class);
         query.setParameter("idUserRequest", idfriend);
         query.setParameter("idUserFriend", id);
-        TempFriendModel singleResult = (TempFriendModel) query.getSingleResult();
+        FriendModel singleResult = (FriendModel) query.getSingleResult();
         singleResult.setStatus(1);
         session.saveOrUpdate(singleResult);
     }
-    
+
     @Override
     public void disAgreeAddFriend(int id, int idfriend) {
         Session session = sessionFactory.getCurrentSession();
         //thay doi trang thai ket ban
-        Query query = session.createQuery("FROM TempFriendModel t"
+        Query query = session.createQuery("FROM FriendModel t"
                 + " WHERE t.userFriend.id = :idUserFriend"
-                + " AND t.userRequest.id = :idUserRequest", TempFriendModel.class);
+                + " AND t.userRequest.id = :idUserRequest", FriendModel.class);
         query.setParameter("idUserRequest", idfriend);
         query.setParameter("idUserFriend", id);
-        TempFriendModel singleResult = (TempFriendModel) query.getSingleResult();
+        FriendModel singleResult = (FriendModel) query.getSingleResult();
         singleResult.setStatus(-1);
         session.saveOrUpdate(singleResult);
     }
@@ -80,19 +83,33 @@ public class FriendRepositoryImpl implements FriendRepository {
     @Override
     public void requestAddFriend(int idUserRequest, int idUserFriend) {
         Session session = sessionFactory.getCurrentSession();
-        TempFriendModel tempFriendModel = new TempFriendModel();
-        tempFriendModel.setUserRequest(new UserModel(idUserRequest));
-        tempFriendModel.setUserFriend(new UserModel(idUserFriend));
-        tempFriendModel.setStatus(0);
-        session.save(tempFriendModel);
-
+        FriendModel friendModel = new FriendModel();
+        friendModel.setUserRequest(new UserModel(idUserRequest));
+        friendModel.setUserFriend(new UserModel(idUserFriend));
+        friendModel.setStatus(0);
+        session.save(friendModel);
     }
 
+    //request cua nguoi yeu cau ket ban
+    @Override
+    public List<UserModel> getUserSentRequestAddFriend(Integer id) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("SELECT t.userFriend"
+                + " FROM FriendModel t"
+                + " WHERE t.userRequest.id = :idUserRequest"
+                + " AND t.status = :status", UserModel.class);
+        query.setParameter("idUserRequest", id);
+        query.setParameter("status", 0);
+        List<UserModel> resultList = query.getResultList();
+        return resultList;
+    }
+
+    //request cua nguoi duoc yeu cau ket ban
     @Override
     public List<UserModel> getRequestAddFriend(int idUserFriend) {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("SELECT t.userRequest"
-                + " FROM TempFriendModel t"
+                + " FROM FriendModel t"
                 + " WHERE t.userFriend.id = :idUserFriend"
                 + " AND t.status = :status", UserModel.class);
         query.setParameter("idUserFriend", idUserFriend);
@@ -105,7 +122,7 @@ public class FriendRepositoryImpl implements FriendRepository {
     public List<UserModel> getResponseAddFriend(int idUserRequest) {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("SELECT t.userFriend"
-                + " FROM TempFriendModel t"
+                + " FROM FriendModel t"
                 + " WHERE t.userRequest.id = :idUserRequest"
                 + " AND t.status = :status", UserModel.class);
         query.setParameter("idUserRequest", idUserRequest);
@@ -118,7 +135,7 @@ public class FriendRepositoryImpl implements FriendRepository {
     public List<UserModel> getDisAgreeResponseAddFriend(int idUserRequest) {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createQuery("SELECT t.userFriend"
-                + " FROM TempFriendModel t"
+                + " FROM FriendModel t"
                 + " WHERE t.userRequest.id = :idUserRequest"
                 + " AND t.status = :status", UserModel.class);
         query.setParameter("idUserRequest", idUserRequest);
@@ -128,26 +145,25 @@ public class FriendRepositoryImpl implements FriendRepository {
     }
 
     @Override
-    public void removeTempFriend(int id, int status) {
+    public void updateOrDeleteStatusAddFriend(int id, int status) {
         Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("DELETE FROM TempFriendModel t"
-                + " WHERE t.userRequest.id = :idUserRequest"
-                + " AND t.status = :status");
-        query.setParameter("idUserRequest", id);
-        query.setParameter("status", status);
-        query.executeUpdate();
-    }
+        if (status == -1) {
+            Query query = session.createQuery("DELETE FROM FriendModel t"
+                    + " WHERE t.userRequest.id = :idUserRequest"
+                    + " AND t.status = :status");
+            query.setParameter("idUserRequest", id);
+            query.setParameter("status", status);
+            query.executeUpdate();
+        }
+        if (status == 1) {
+            Query query = session.createQuery("FROM FriendModel t"
+                    + " WHERE t.userRequest.id = :idUserRequest"
+                    + " AND t.status = :status", FriendModel.class);
+            query.setParameter("idUserRequest", id);
+            query.setParameter("status", status);
+            FriendModel singleResult = (FriendModel) query.getSingleResult();
+            singleResult.setStatus(2);
+        }
 
-    @Override
-    public List<UserModel> getUserSentRequestAddFriend(Integer id) {
-        Session session = sessionFactory.getCurrentSession();
-        Query query = session.createQuery("SELECT t.userFriend"
-                + " FROM TempFriendModel t"
-                + " WHERE t.userRequest.id = :idUserRequest"
-                + " AND t.status = :status", UserModel.class);
-        query.setParameter("idUserRequest", id);
-        query.setParameter("status", 0);
-        List<UserModel> resultList = query.getResultList();
-        return resultList;
     }
 }

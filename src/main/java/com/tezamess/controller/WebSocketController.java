@@ -3,6 +3,7 @@ package com.tezamess.controller;
 import com.tezamess.map.MappedRoomModel;
 import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ChatMessage;
+import com.tezamess.model.ParticipationModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
@@ -49,11 +50,27 @@ public class WebSocketController {
         System.out.println(json);
 
         RoomModel room = roomServiceImpl.findOrCreateRoom(json);
+//        if (room != null) {
+//            Set<UserModel> listUser = room.getUserModelList();
+//            listUser.stream().forEach(t -> {
+//                System.out.println(t.getId() + "----id nhan duoc thong bao tao room");
+//                sendingOperations.convertAndSend("/room/user/" + t.getId(),
+//                        new ResultModelV2(ResultModelV2.Status.CREATE_ROOM.getStatus(),
+//                                MappedRoomModel.convertToMap(room),
+//                                ResultModelV2.Status.CREATE_ROOM.name(),
+//                                new Date()));
+//
+//            });
+//        } else {
+//            System.out.println("loi !!!!!");
+//        }
+
+//---------------------------------
         if (room != null) {
-            Set<UserModel> listUser = room.getUserModelList();
+            Set<ParticipationModel> listUser = room.getParticipationModels();
             listUser.stream().forEach(t -> {
-                System.out.println(t.getId() + "----id nhan duoc thong bao tao room");
-                sendingOperations.convertAndSend("/room/user/" + t.getId(),
+                System.out.println(t.getUser().getId() + "----id nhan duoc thong bao tao room");
+                sendingOperations.convertAndSend("/room/user/" + t.getUser().getId(),
                         new ResultModelV2(ResultModelV2.Status.CREATE_ROOM.getStatus(),
                                 MappedRoomModel.convertToMap(room),
                                 ResultModelV2.Status.CREATE_ROOM.name(),
@@ -63,6 +80,17 @@ public class WebSocketController {
         } else {
             System.out.println("loi !!!!!");
         }
+    }
+
+    //client phan hoi da nhan duoc phong chat
+    @MessageMapping("/response/receivedroom")
+    public void responseReceivedRoom(@Payload String json) {
+        System.out.println(json);
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("id");
+        int idRoom = jSONObject.getInt("idRoom");
+        roomServiceImpl.changeStatusReceivedRoom(id, idRoom);
+
     }
 
     //tim phong chat
@@ -156,7 +184,7 @@ public class WebSocketController {
         int id = jSONObject.getInt("idRequest");
         int status = jSONObject.getInt("status");
         // xoa nhung record co trang thai la 1 cua nguoi gui
-        friendServiceImpl.removeTempFriend(id, status);
+        friendServiceImpl.updateOrDeleteStatusAddFriend(id, status);
     }
 
     //thong bao trang thai online 
@@ -210,6 +238,14 @@ public class WebSocketController {
                 new ResultModelV2(ResultModelV2.Status.RESPONSE_DISAGREE_ADDFRIEND.getStatus(),
                         responseDisAgreeAddFriend,
                         ResultModelV2.Status.RESPONSE_DISAGREE_ADDFRIEND.name(),
+                        new Date()));
+
+        // gui nhung phong da tao trong khi client dang offline
+        List<Map<String, Object>> roomNotReceived = roomServiceImpl.getRoomNotReceived(id);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.ROOM_NOT_RECEIVED.getStatus(),
+                        roomNotReceived,
+                        ResultModelV2.Status.ROOM_NOT_RECEIVED.name(),
                         new Date()));
     }
 
