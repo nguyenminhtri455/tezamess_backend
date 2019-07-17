@@ -17,7 +17,6 @@ public class MappedUserModel {
         map.put("id", user.getId());
         map.put("phone", user.getPhone());
         map.put("name", user.getName());
-        user.setPassword(new String(Base64.getDecoder().decode(user.getPassword())));
         map.put("password", user.getPassword());
         map.put("birthday", user.getBirthday());
         map.put("gender", user.getGender());
