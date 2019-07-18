@@ -8,6 +8,7 @@ import com.tezamess.service.UserService;
 import com.tezamess.validator.UserValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tezamess.map.MappedUserModel;
+import static com.tezamess.map.MappedUserModel.convertToMapBy4Record;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
 import com.tezamess.repository.FriendRepository;
@@ -20,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -333,7 +335,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void notifyOnlineToRoomAndFriend(int userId) {
+    public void notifyOnlineToRoomAndFriend(int userId, boolean login) {
         //thong bao online den ban be
         List<UserModel> friends = friendRepository.getFriends(userId);
         Map<String, Object> mapFriend = new HashMap<>();
@@ -366,6 +368,39 @@ public class UserServiceImpl implements UserService {
             messagingTemplate.convertAndSend("/room/" + t.getRoom().getId(), mapRoom);
         });
 
+        if (!login) {
+            List<Map<String, Object>> rooms = new ArrayList<>();
+            user.getParticipationModels().stream()
+                    .forEach(t -> {
+                        Map<String, Object> m = new HashMap<>();
+                        m.put("id", t.getRoom().getId());
+                        m.put("creator", t.getRoom().getCreator().getId());
+                        m.put("name", t.getRoom().getName());
+                        m.put("type", t.getRoom().getTypeRoomModel().getId());
+                        m.put("size", t.getRoom().getParticipationModels().size());
+
+                        //Danh sach thanh vien trong phong
+                        List<Map<String, Object>> members = new ArrayList<>();
+                        t.getRoom().getParticipationModels().stream().forEach(s -> {
+                            Map<String, Object> member = convertToMapBy4Record(s.getUser());
+                            members.add(member);
+                        });
+                        m.put("members", members);
+                        rooms.add(m);
+                    });
+
+            List<Map<String, Object>> mappingFriends = new ArrayList<>();
+            if (friends.size() > 0) {
+                mappingFriends = friends.stream().map(t -> MappedUserModel.convertToMapBy4Record(t)).collect(Collectors.toList());
+            }
+            Map<String, Object> map = new HashMap<>();
+            map.put("rooms", rooms);
+            map.put("friends", mappingFriends);
+            messagingTemplate.convertAndSend("/room/user/" + userId
+                    , new ResultModelV2(ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.getStatus()
+                            , map, ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.name()
+                            , new Date()));
+        }
     }
 
     @Override

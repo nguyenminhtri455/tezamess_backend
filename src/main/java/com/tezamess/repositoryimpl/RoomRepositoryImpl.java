@@ -127,16 +127,18 @@ public class RoomRepositoryImpl implements RoomRepository {
 //        return null;
 
 //-------------------------------------------------
+   
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery("SELECT * FROM participation as p"
                 + " WHERE p.userid IN :ids"
                 + " GROUP BY p.groupid"
                 + " HAVING COUNT(*) = :size");
         query.setParameterList("ids", listId);
-        query.setParameter("size", listId.size());
+        query.setParameter("size", listId.size());       
         List<Object[]> resultList = query.getResultList();
-        for (Object[] o : resultList) {
-            RoomModel room = session.get(RoomModel.class, (int) o[0]);
+        
+        for (Object[] o : resultList) {      
+            RoomModel room = session.get(RoomModel.class, (int) o[1]);
             List<Integer> collect = room.getParticipationModels().stream()
                     .map((participation) -> participation.getUser().getId())
                     .collect(Collectors.toList());
@@ -168,7 +170,7 @@ public class RoomRepositoryImpl implements RoomRepository {
                 + " AND p.status = :status", RoomModel.class);
         query.setParameter("id", id);
         query.setParameter("status", 0);
-        List<RoomModel> rooms = query.getResultList();        
+        List<RoomModel> rooms = query.getResultList();
         return rooms;
     }
 }

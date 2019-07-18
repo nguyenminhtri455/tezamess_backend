@@ -213,8 +213,9 @@ public class WebSocketController {
         System.out.println(messageConnect);
         JSONObject jSONObject = new JSONObject(messageConnect);
         int id = jSONObject.getInt("user");
+        boolean login = jSONObject.getBoolean("login");
         headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
-        userServiceImpl.notifyOnlineToRoomAndFriend(id);
+        userServiceImpl.notifyOnlineToRoomAndFriend(id, login);
 
         // get request_addfriend
         List<Map<String, Object>> requestAddFriend = friendServiceImpl.getRequestAddFriend(id);

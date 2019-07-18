@@ -37,12 +37,10 @@ public class MappedRoomModel {
 
     public static List<Map<String, Object>> convertToMap(List<RoomModel> rooms) {
         List<Map<String, Object>> mapRooms = new ArrayList<>();
-        System.out.println("11111111sizeeeeeeeeeeeeeeeeeeeeeeeeee" + rooms.size());
         rooms.stream().forEach(room -> {        
                 Map<String, Object> mapRoom = convertToMap(room);
                 mapRooms.add(mapRoom);      
         });
-        System.out.println("sizeeeeeeeeeeeeeeeeeeeeeeeeee" + mapRooms.size());
         return mapRooms;
     }
 }

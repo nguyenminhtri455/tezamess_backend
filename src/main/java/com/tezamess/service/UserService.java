@@ -29,5 +29,5 @@ public interface UserService {
 
     ResponseEntity<Object> userUsingApp(String token, String json);
 
-    void notifyOnlineToRoomAndFriend(int userId);
+    void notifyOnlineToRoomAndFriend(int userId, boolean login);
 }
