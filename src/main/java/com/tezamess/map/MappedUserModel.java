@@ -120,7 +120,6 @@ public class MappedUserModel {
                     m.put("name", t.getRoom().getName());
                     m.put("type", t.getRoom().getTypeRoomModel().getId());
                     m.put("size", t.getRoom().getParticipationModels().size());
-//                    if (t.getTypeRoomModel().getId().equals("D")) {
                     //Danh sach thanh vien trong phong
                     List<Map<String, Object>> members = new ArrayList<>();
                     t.getRoom().getParticipationModels().stream().forEach(s -> {
@@ -128,7 +127,6 @@ public class MappedUserModel {
                         members.add(member);
                     });
                     m.put("members", members);
-//                    }
                     rooms.add(m);
 
                     //Danh sach tin nhan trong phong

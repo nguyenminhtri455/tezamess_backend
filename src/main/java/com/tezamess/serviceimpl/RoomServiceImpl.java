@@ -1,17 +1,21 @@
 package com.tezamess.serviceimpl;
 
 import com.tezamess.map.MappedRoomModel;
+import com.tezamess.map.MappedUserModel;
+import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.repositoryimpl.RoomRepositoryImpl;
 import com.tezamess.service.RoomService;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +23,9 @@ public class RoomServiceImpl implements RoomService {
 
     @Autowired
     private RoomRepositoryImpl roomRepositoryImpl;
+
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
 
     @Override
     public RoomModel findOrCreateRoom(String json) {
@@ -83,5 +90,46 @@ public class RoomServiceImpl implements RoomService {
     public List<Map<String, Object>> getRoomNotReceived(int id) {
         List<Map<String, Object>> convertToMap = MappedRoomModel.convertToMap(roomRepositoryImpl.getRoomNotReceived(id));
         return convertToMap;
+    }
+
+    @Override
+    public void inviteMembers(String json) {
+        JSONObject jSONObject = new JSONObject(json);
+        int idRoom = jSONObject.getInt("idRoom");
+        List<Integer> ids = new ArrayList();
+        JSONArray jsonArray = jSONObject.getJSONArray("ids");
+        for (int i = 0; i < jsonArray.length(); i++) {
+            ids.add(jsonArray.getInt(i));
+        }
+        RoomModel inviteMember = roomRepositoryImpl.inviteMember(idRoom, ids);
+        Map<String, Object> convertToMap = MappedRoomModel.convertToMap(inviteMember);
+
+        inviteMember.getParticipationModels().stream().forEach(t -> {
+            messagingTemplate.convertAndSend("/room/user/" + t.getUser().getId(),
+                    new ResultModelV2(ResultModelV2.Status.INVITE_MEMBER.getStatus(),
+                            convertToMap, ResultModelV2.Status.INVITE_MEMBER.name(),
+                            new Date()));
+        });
+    }
+
+    @Override
+    public void leaveRoom(String json) {
+        JSONObject jSONObject = new JSONObject(json);
+        int idRoom = jSONObject.getInt("idRoom");
+        int idUser = jSONObject.getInt("idUser");
+
+        RoomModel leaveRoom = roomRepositoryImpl.leaveRoom(idRoom, idUser);
+        Map<String, Object> convertToMap = MappedRoomModel.convertToMap(leaveRoom);
+
+        leaveRoom.getParticipationModels().stream().forEach(t -> {
+            messagingTemplate.convertAndSend("/room/user/" + t.getUser().getId(),
+                    new ResultModelV2(ResultModelV2.Status.LEAVE_ROOM.getStatus(),
+                            convertToMap, ResultModelV2.Status.LEAVE_ROOM.name(),
+                            new Date()));
+        });
+        messagingTemplate.convertAndSend("/room/user/" + idUser,
+                new ResultModelV2(ResultModelV2.Status.LEAVE_ROOM.getStatus(),
+                        convertToMap, ResultModelV2.Status.LEAVE_ROOM.name(),
+                        new Date()));
     }
 }

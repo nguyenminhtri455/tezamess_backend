@@ -46,7 +46,7 @@ public class RoomModel implements Serializable {
     private String avatar;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "creator", referencedColumnName = "id", updatable = false)
+    @JoinColumn(name = "creator", referencedColumnName = "id", updatable = true)
     private UserModel creator;
 
     @ManyToOne(fetch = FetchType.LAZY)

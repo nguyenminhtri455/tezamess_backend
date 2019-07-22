@@ -336,8 +336,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void notifyOnlineToRoomAndFriend(int userId, boolean login) {
-        //thong bao online den ban be
+        // lay danh sach ban be
         List<UserModel> friends = friendRepository.getFriends(userId);
+        // ket ban voi admin
+        UserModel admin = null;
+        if (userId != 1000 && !friends.contains(new UserModel(1000))) {
+            friendRepository.addFriendAdmin(userId, 1000);
+            admin = userRepositoryImpl.findUserById(1000);
+            friends.add(admin);
+        }
+        //thong bao online den ban be
         Map<String, Object> mapFriend = new HashMap<>();
         mapFriend.put("createdate", new Date().getTime());
         mapFriend.put("body", "Online");
@@ -357,12 +365,6 @@ public class UserServiceImpl implements UserService {
         mapRoom.put("user", userId);
         mapRoom.put("type", "Notify");
         mapRoom.put("status", "Online");
-//        user.getRoomModelList().stream().forEach(t -> {
-//            mapRoom.put("room", t.getId());
-//            messagingTemplate.convertAndSend("/room/" + t.getId(), mapRoom);
-//        });
-
-//------------------------------------
         user.getParticipationModels().stream().forEach(t -> {
             mapRoom.put("room", t.getRoom().getId());
             messagingTemplate.convertAndSend("/room/" + t.getRoom().getId(), mapRoom);
@@ -396,10 +398,25 @@ public class UserServiceImpl implements UserService {
             Map<String, Object> map = new HashMap<>();
             map.put("rooms", rooms);
             map.put("friends", mappingFriends);
-            messagingTemplate.convertAndSend("/room/user/" + userId
-                    , new ResultModelV2(ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.getStatus()
-                            , map, ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.name()
-                            , new Date()));
+            messagingTemplate.convertAndSend("/room/user/" + userId,
+                    new ResultModelV2(ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.getStatus(),
+                            map, ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.name(),
+                            new Date()));
+        } else {
+            Map<String, Object> map = new HashMap<>();
+            List<Map<String, Object>> users = new ArrayList();
+            Map<String, Object> convertToMapBy4Record;
+
+            if (admin != null) {
+                convertToMapBy4Record = MappedUserModel.convertToMapBy4Record(admin);
+                users.add(convertToMapBy4Record);
+            }
+            map.put("rooms", new ArrayList());
+            map.put("friends", users);
+            messagingTemplate.convertAndSend("/room/user/" + userId,
+                    new ResultModelV2(ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.getStatus(),
+                            map, ResultModelV2.Status.GET_ROOMS_AND_FRIENDS.name(),
+                            new Date()));
         }
     }
 

@@ -3,6 +3,7 @@ package com.tezamess.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,7 +31,6 @@ public class UserModel implements Serializable {
 //            inverseJoinColumns = {
 //                @JoinColumn(name = "groupid")})
 //    private Set<RoomModel> roomModelList = new HashSet<>();
-    
     //----------------------------------
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<ParticipationModel> participationModels = new HashSet();
@@ -163,6 +163,21 @@ public class UserModel implements Serializable {
 
     public void setParticipationModels(Set<ParticipationModel> participationModels) {
         this.participationModels = participationModels;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+
+        if (!(o instanceof UserModel)) {
+            return false;
+        }
+
+        UserModel user = (UserModel) o;
+
+        return Objects.equals(this.getId(), user.getId());
     }
 
 }

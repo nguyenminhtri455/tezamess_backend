@@ -67,6 +67,17 @@ public class FriendRepositoryImpl implements FriendRepository {
     }
 
     @Override
+    public void addFriendAdmin(int id, int idfriend) {
+        Session session = sessionFactory.getCurrentSession();
+        //luu ket ban
+        FriendModel friendModel = new FriendModel();
+        friendModel.setUserRequest(new UserModel(idfriend));
+        friendModel.setUserFriend(new UserModel(id));
+        friendModel.setStatus(2);
+        session.save(friendModel);
+    }
+
+    @Override
     public void disAgreeAddFriend(int id, int idfriend) {
         Session session = sessionFactory.getCurrentSession();
         //thay doi trang thai ket ban

@@ -16,4 +16,8 @@ public interface RoomRepository {
     void changeStatusReceivedRoom(int id, int idRoom);
 
     List<RoomModel> getRoomNotReceived(int id);
+
+    RoomModel inviteMember(int idRoom, List<Integer> ids);
+
+    RoomModel leaveRoom(int idRoom, int idUser);
 }

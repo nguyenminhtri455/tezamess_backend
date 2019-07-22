@@ -28,8 +28,8 @@ public class ParticipationModel implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     private RoomModel room;
 
-    @Column(name = "status")
-    private Integer status;
+//    @Column(name = "status")
+//    private Integer status;
 
     public UserModel getUser() {
         return user;
@@ -47,13 +47,13 @@ public class ParticipationModel implements Serializable {
         this.room = room;
     }
 
-    public Integer getStatus() {
-        return status;
-    }
-
-    public void setStatus(Integer status) {
-        this.status = status;
-    }
+//    public Integer getStatus() {
+//        return status;
+//    }
+//
+//    public void setStatus(Integer status) {
+//        this.status = status;
+//    }
 
     public Integer getId() {
         return id;

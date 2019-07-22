@@ -130,7 +130,7 @@ public class MessageRepositoryImpl implements MessageRepository {
                     + " (SELECT t.idmessage.id FROM TempMessageModel t"
                     + " WHERE t.idRoom.id = :roomid AND t.idmember.id = :memberid)"
                     + " AND (SELECT MAX(t.idmessage.id) FROM TempMessageModel t"
-                    + " WHERE t.idRoom.id = :roomid)");
+                    + " WHERE t.idRoom.id = :roomid)", MessageModel.class);
             query1.setParameter("roomid", t.getRoom().getId());
             query1.setParameter("memberid", idUser);
             List<MessageModel> messages = query1.getResultList();

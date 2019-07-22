@@ -11,6 +11,10 @@ public interface RoomService {
     RoomModel findOrCreateRoom(String json);
 
     void changeStatusReceivedRoom(int id, int idRoom);
-    
+
     List<Map<String, Object>> getRoomNotReceived(int id);
+
+    void inviteMembers(String json);
+
+    void leaveRoom(String json);
 }

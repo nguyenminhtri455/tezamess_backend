@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Set;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -82,7 +81,7 @@ public class WebSocketController {
         }
     }
 
-    //client phan hoi da nhan duoc phong chat
+    //client phan hoi da nhan duoc phong chat (khong con su dung)
     @MessageMapping("/response/receivedroom")
     public void responseReceivedRoom(@Payload String json) {
         System.out.println(json);
@@ -217,6 +216,13 @@ public class WebSocketController {
         headerAccessor.getSessionAttributes().put("username", String.valueOf(id));
         userServiceImpl.notifyOnlineToRoomAndFriend(id, login);
 
+        List<Map<String, Object>> messageaUnread = messageServiceImpl.getMessageaUnread(id);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.UNREAD_MESSAGE.getStatus(),
+                        messageaUnread,
+                        ResultModelV2.Status.UNREAD_MESSAGE.name(),
+                        new Date()));
+
         // get request_addfriend
         List<Map<String, Object>> requestAddFriend = friendServiceImpl.getRequestAddFriend(id);
         sendingOperations.convertAndSend("/room/user/" + id,
@@ -242,17 +248,17 @@ public class WebSocketController {
                         new Date()));
 
         // gui nhung phong da tao trong khi client dang offline
-        List<Map<String, Object>> roomNotReceived = roomServiceImpl.getRoomNotReceived(id);
-        sendingOperations.convertAndSend("/room/user/" + id,
-                new ResultModelV2(ResultModelV2.Status.ROOM_NOT_RECEIVED.getStatus(),
-                        roomNotReceived,
-                        ResultModelV2.Status.ROOM_NOT_RECEIVED.name(),
-                        new Date()));
+//        List<Map<String, Object>> roomNotReceived = roomServiceImpl.getRoomNotReceived(id);
+//        sendingOperations.convertAndSend("/room/user/" + id,
+//                new ResultModelV2(ResultModelV2.Status.ROOM_NOT_RECEIVED.getStatus(),
+//                        roomNotReceived,
+//                        ResultModelV2.Status.ROOM_NOT_RECEIVED.name(),
+//                        new Date()));
     }
 
-    //tai tin nhan chua doc
+    //tai tin nhan chua doc (khong con su dung)
     @MessageMapping("/load/messages.unread")
-    public String loadMessageUnread(@Payload String json) {
+    public void loadMessageUnread(@Payload String json) {
         System.out.println(json);
         JSONObject jSONObject = new JSONObject(json);
         int id = jSONObject.getInt("id");
@@ -262,7 +268,6 @@ public class WebSocketController {
                         messageaUnread,
                         ResultModelV2.Status.UNREAD_MESSAGE.name(),
                         new Date()));
-        return json;
     }
 
     //loadmore tin nhan
@@ -305,6 +310,20 @@ public class WebSocketController {
                         MappedUserModel.convertToMapBy4Record(userByPhone),
                         ResultModelV2.Status.FIND_FRIEND.name(),
                         new Date()));
+    }
+
+    //them thanh vien vao nhom 
+    @MessageMapping("/invite/member")
+    public void inviteMember(@Payload String json) {
+        System.out.println(json);
+        roomServiceImpl.inviteMembers(json);
+    }
+
+    //roi khoi nhom chat
+    @MessageMapping("/leave/room")
+    public void leaveRoom(@Payload String json) {
+        System.out.println(json);
+        roomServiceImpl.leaveRoom(json);
     }
 
     //test by Android
