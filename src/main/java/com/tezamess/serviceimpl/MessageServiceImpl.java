@@ -4,6 +4,7 @@ import com.tezamess.map.MappedMessageModel;
 import com.tezamess.model.MessageModel;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.TempMessageModel;
+import com.tezamess.model.TypeMessageModel;
 import com.tezamess.model.UserModel;
 import com.tezamess.repositoryimpl.MessageRepositoryImpl;
 import com.tezamess.service.MessageService;
@@ -37,12 +38,24 @@ public class MessageServiceImpl implements MessageService {
             String body = jSONObject.getString("body");
             int roomId = jSONObject.getInt("room");
             int senderId = jSONObject.getInt("user");
+            String type = jSONObject.getString("type");
 
             UserModel userModel = new UserModel(senderId);
             messageModel.setCreatedate(new Date(time));
             messageModel.setBody(body);
             messageModel.setRoomid(new RoomModel(roomId));
             messageModel.setUserid(userModel);
+            switch (type) {
+                case "Chat":
+                    messageModel.setTypeMessageModel(new TypeMessageModel("C"));
+                    break;
+                case "Image":
+                    messageModel.setTypeMessageModel(new TypeMessageModel("I"));
+                    break;
+                case "File":
+                    messageModel.setTypeMessageModel(new TypeMessageModel("F"));
+                    break;
+            }
 
             MessageModel message = messageRepositoryImpl.saveMessage(messageModel);
 
@@ -149,7 +162,5 @@ public class MessageServiceImpl implements MessageService {
         List<MessageModel> loadMessages = messageRepositoryImpl.loadMessages(idRoom, start, count);
         return MappedMessageModel.convertListMessageChatNoStatus(loadMessages);
     }
-
-   
 
 }
