@@ -30,4 +30,10 @@ public interface UserService {
     ResponseEntity<Object> userUsingApp(String token, String json);
 
     void notifyOnlineToRoomAndFriend(int userId, boolean login);
+
+    ResponseEntity<Object> getResetCode(String json);
+
+    ResponseEntity<Object> recoverPassword(String json);
+
+    void sendEmail(String to, String subject, String msg);
 }

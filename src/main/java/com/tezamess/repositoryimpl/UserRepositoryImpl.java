@@ -146,6 +146,18 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public UserModel findUserByEmail(String email) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM UserModel WHERE email = :email");
+        query.setParameter("email", email);
+        List<UserModel> users = query.getResultList();
+        if (users != null && users.size() > 0) {
+            return users.get(0);
+        }
+        return null;
+    }
+
+    @Override
     public UserModel findUserById(int id) {
         Session session = sessionFactory.getCurrentSession();
         UserModel user = session.get(UserModel.class, id);
@@ -203,5 +215,14 @@ public class UserRepositoryImpl implements UserRepository {
         UserModel user = session.get(UserModel.class, id);
         user.setLastactive(new Date());
         session.saveOrUpdate(user);
+    }
+
+    public void recoverPassword(UserModel user) {
+        Session session = sessionFactory.getCurrentSession();
+        UserModel userModel = findUserByEmail(user.getEmail());
+        if (userModel != null) {
+            String passwordEncryption = Base64.getEncoder().encodeToString(user.getPassword().getBytes());
+            userModel.setPassword(passwordEncryption);
+        }
     }
 }

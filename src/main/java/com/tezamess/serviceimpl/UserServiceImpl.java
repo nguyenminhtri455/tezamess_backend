@@ -15,13 +15,29 @@ import com.tezamess.repository.FriendRepository;
 import com.tezamess.utils.FileUtils;
 import java.util.Base64;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -58,6 +74,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    private static Message message;
 
     @Override
     public List<Map<String, Object>> findAll() {
@@ -492,5 +510,140 @@ public class UserServiceImpl implements UserService {
             return new ResponseEntity<>(new ResultModelV2(Status.ERROR_FAILED.getStatus(), null, environment.getProperty("error.update.unexists"), new Date()), HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(new ResultModelV2(Status.SUCCESS.getStatus(), MappedUserModel.convertToMap(userModel), Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> getResetCode(String json) {
+        String email;
+        String resetCode;
+        String subject = "Recover Password";
+        String msg = " là mã reset mật khẩu của bạn.";
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+            System.out.println(json);
+            JSONObject jsonObject = new JSONObject(json);
+            Random random = new Random();
+            resetCode = String.valueOf(random.nextInt(999999 - 100000) + 100000);
+            email = jsonObject.getString("email");
+
+            msg = resetCode + msg;
+            sendEmail(email, subject, msg);
+
+        } catch (IOException | JSONException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (InvalidateException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_VALIDATE.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                new ResultModelV2(Status.SUCCESS.getStatus(), resetCode, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Object> recoverPassword(String json) {
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+            System.out.println(json);
+            JSONObject jsonObject = new JSONObject(json);
+
+            //convert input data thanh UserModel
+            ObjectMapper mapper = new ObjectMapper();
+            UserModel user = mapper.readValue(json, UserModel.class);
+
+            userRepositoryImpl.recoverPassword(user);
+
+        } catch (IOException | JSONException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_JSON.getStatus(), null, environment.getProperty("json.invalid"), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (InvalidateException ex) {
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_VALIDATE.getStatus(), null, ex.getMessage(), new Date()), HttpStatus.BAD_REQUEST);
+        } catch (Exception ex) {
+            System.out.println(ex.toString());
+            return new ResponseEntity<>(new ResultModelV2(Status.ERROR_SERVER.getStatus(), null, environment.getProperty("error.server"), new Date()), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(
+                new ResultModelV2(Status.SUCCESS.getStatus(), null, Status.SUCCESS.name(), new Date()), HttpStatus.OK);
+    }
+
+    @Override
+    public void sendEmail(String to, String subject, String msg) {
+
+        String SMTP_HOST_NAME = "smtp.gmail.com"; //can be your host server smtp@yourdomain.com
+        String SMTP_AUTH_USER = "zoro53831@gmail.com"; //your login username/email
+        String SMTP_AUTH_PWD = "Gmail.com@111111"; //password/secret
+
+        String username = SMTP_AUTH_USER;
+        String password = SMTP_AUTH_PWD;
+
+        // Assuming you are sending email through relay.jangosmtp.net
+        String host = SMTP_HOST_NAME;
+
+        Properties props = new Properties();
+
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", host);
+        props.put("mail.smtp.port", "587");
+
+        // Get the Session object.
+        Session session = Session.getInstance(props,
+                new javax.mail.Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+
+        try {
+//            Create a default MimeMessage object.
+            message = new MimeMessage(session);
+
+            // Set From: header field of the header.
+            message.setFrom(new InternetAddress(username, "Tezamess"));
+
+            // Set To: header field of the header.
+            message.setRecipients(Message.RecipientType.TO,
+                    InternetAddress.parse(to));
+
+            // Set Subject: header field
+            message.setSubject(subject);
+
+            // Create the message part
+            BodyPart messageBodyPart = new MimeBodyPart();
+
+            // Now set the actual message
+            messageBodyPart.setContent(msg, "text/html; charset=utf-8");
+
+            // Create a multipar message
+            Multipart multipart = new MimeMultipart();
+
+            // Set text message part
+            multipart.addBodyPart(messageBodyPart);
+
+            // Send the complete message parts
+            message.setContent(multipart);
+
+            Thread thread = new Thread(() -> {
+                try {
+                    // Send message
+                    Transport.send(message);
+                } catch (MessagingException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            thread.start();
+        } catch (UnsupportedEncodingException | MessagingException ex) {
+            Logger.getLogger(UserServiceImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

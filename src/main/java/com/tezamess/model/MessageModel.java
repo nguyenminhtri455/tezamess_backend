@@ -2,9 +2,7 @@ package com.tezamess.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Set;
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -13,13 +11,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlTransient;
 
 @Entity
 @Table(name = "message")
@@ -28,7 +23,7 @@ public class MessageModel implements Serializable {
     @Column(name = "createdate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdate;
- 
+
     @Size(min = 1, max = 500)
     @Column(name = "body")
     private String body;
@@ -38,14 +33,17 @@ public class MessageModel implements Serializable {
     @Column(name = "id")
     private Integer id;
 
-
-    @JoinColumn(name = "groupid")
+    @JoinColumn(name = "roomid")
     @ManyToOne(fetch = FetchType.LAZY)
     private RoomModel room;
 
     @JoinColumn(name = "userid", updatable = false)
     @ManyToOne(fetch = FetchType.LAZY)
     private UserModel user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type", referencedColumnName = "id", updatable = false)
+    private TypeMessageModel typeMessageModel;
 
     public MessageModel() {
     }
@@ -67,7 +65,6 @@ public class MessageModel implements Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
-
 
     public RoomModel getRoomid() {
         return room;
@@ -92,7 +89,7 @@ public class MessageModel implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-         if (obj == null) {
+        if (obj == null) {
             return false;
         }
 
@@ -101,7 +98,7 @@ public class MessageModel implements Serializable {
         }
 
         MessageModel messageModel = (MessageModel) obj;
-        if (this.id == messageModel.getId()) {
+        if (Objects.equals(this.id, messageModel.getId())) {
             return true;
         }
 
@@ -123,5 +120,15 @@ public class MessageModel implements Serializable {
     public void setBody(String body) {
         this.body = body;
     }
+
+    public TypeMessageModel getTypeMessageModel() {
+        return typeMessageModel;
+    }
+
+    public void setTypeMessageModel(TypeMessageModel typeMessageModel) {
+        this.typeMessageModel = typeMessageModel;
+    }
     
+    
+
 }

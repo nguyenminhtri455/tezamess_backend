@@ -24,7 +24,7 @@ public class ParticipationModel implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     private UserModel user;
 
-    @JoinColumn(name = "groupid")
+    @JoinColumn(name = "roomid")
     @ManyToOne(fetch = FetchType.EAGER)
     private RoomModel room;
 

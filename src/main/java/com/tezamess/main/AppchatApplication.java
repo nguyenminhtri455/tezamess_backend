@@ -2,6 +2,7 @@ package com.tezamess.main;
 
 import com.tezamess.utils.FileUtils;
 import com.tezamess.validator.UserValidator;
+import javax.mail.Message;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

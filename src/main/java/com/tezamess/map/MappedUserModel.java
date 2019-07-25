@@ -31,6 +31,8 @@ public class MappedUserModel {
         map.put("id", user.getId());
         map.put("phone", user.getPhone());
         map.put("name", user.getName());
+        map.put("birthday", user.getBirthday());
+        map.put("gender", user.getGender());
         map.put("urlavatar", user.getUrlavatar());
         map.put("lastactive", user.getLastactive().getTime());
         return map;

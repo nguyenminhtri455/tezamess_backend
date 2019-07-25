@@ -23,9 +23,13 @@ public interface UserRepository {
 
     UserModel findUserByPhone(String phone);
 
+    UserModel findUserByEmail(String email);
+
     Boolean userExists(UserModel user);
 
     List<Object[]> checkUserUsingApp(int id, List<Object> listUser);
 
     void updateLastActive(int id);
+
+    void recoverPassword(UserModel user);
 }

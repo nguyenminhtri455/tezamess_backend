@@ -47,7 +47,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.csrf().ignoringAntMatchers("/tezamess/api/**");
 
         http.authorizeRequests()
-                .antMatchers("/", "/tezamess", "/tezamess/api-login", "/tezamess/api-register", "/tezamess/api-users", "tezamess/api-user/{id}")
+                .antMatchers("/", "/tezamess", "/tezamess/api-login"
+                        , "/tezamess/api-register", "/tezamess/api-users"
+                        , "tezamess/api-user/{id}", "tezamess/api-resetcode")
                 .permitAll();
 
         http.antMatcher("/tezamess/api/**").httpBasic().authenticationEntryPoint(restServicesEntryPoint()).and()

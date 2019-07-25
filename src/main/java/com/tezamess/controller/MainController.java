@@ -87,7 +87,7 @@ public class MainController implements ErrorController {
     public ResponseEntity<Object> changePassword(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.changePassword(token, json);
     }
-    
+
     @PutMapping("tezamess/api/update-email")
     public ResponseEntity<Object> updateEmail(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return userServiceImpl.updateEmail(token, json);
@@ -96,6 +96,16 @@ public class MainController implements ErrorController {
     @PostMapping("tezamess/api/get-friends")
     public ResponseEntity<Object> getFriends(@RequestHeader(value = "authorization") String token, @RequestBody(required = false) String json) {
         return friendServiceImpl.getFriends(json);
+    }
+
+    @PostMapping("tezamess/api-resetcode")
+    public ResponseEntity<Object> getResetCode(@RequestBody(required = false) String json) {
+        return userServiceImpl.getResetCode(json);
+    }
+
+    @PostMapping("tezamess/api-recoverpassword")
+    public ResponseEntity<Object> recoverPassword(@RequestBody(required = false) String json) {
+        return userServiceImpl.recoverPassword(json);
     }
 
     //test
