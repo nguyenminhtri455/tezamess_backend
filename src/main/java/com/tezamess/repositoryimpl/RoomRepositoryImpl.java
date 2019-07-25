@@ -111,7 +111,7 @@ public class RoomRepositoryImpl implements RoomRepository {
 //        Session session = sessionFactory.getCurrentSession();
 //        Query query = session.createSQLQuery("SELECT * FROM participation as p"
 //                + " WHERE p.userid IN :ids"
-//                + " GROUP BY p.groupid"
+//                + " GROUP BY p.roomid"
 //                + " HAVING COUNT(*) = :size");
 //        query.setParameterList("ids", listId);
 //        query.setParameter("size", listId.size());
@@ -132,7 +132,7 @@ public class RoomRepositoryImpl implements RoomRepository {
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery("SELECT * FROM participation as p"
                 + " WHERE p.userid IN :ids"
-                + " GROUP BY p.groupid"
+                + " GROUP BY p.roomid"
                 + " HAVING COUNT(*) = :size");
         query.setParameterList("ids", listId);
         query.setParameter("size", listId.size());
