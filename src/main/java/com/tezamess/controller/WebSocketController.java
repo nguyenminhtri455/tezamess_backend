@@ -47,38 +47,7 @@ public class WebSocketController {
     @MessageMapping("/room.create")
     public void createRoom(@Payload String json) {
         System.out.println(json);
-
-        RoomModel room = roomServiceImpl.findOrCreateRoom(json);
-//        if (room != null) {
-//            Set<UserModel> listUser = room.getUserModelList();
-//            listUser.stream().forEach(t -> {
-//                System.out.println(t.getId() + "----id nhan duoc thong bao tao room");
-//                sendingOperations.convertAndSend("/room/user/" + t.getId(),
-//                        new ResultModelV2(ResultModelV2.Status.CREATE_ROOM.getStatus(),
-//                                MappedRoomModel.convertToMap(room),
-//                                ResultModelV2.Status.CREATE_ROOM.name(),
-//                                new Date()));
-//
-//            });
-//        } else {
-//            System.out.println("loi !!!!!");
-//        }
-
-//---------------------------------
-        if (room != null) {
-            Set<ParticipationModel> listUser = room.getParticipationModels();
-            listUser.stream().forEach(t -> {
-                System.out.println(t.getUser().getId() + "----id nhan duoc thong bao tao room");
-                sendingOperations.convertAndSend("/room/user/" + t.getUser().getId(),
-                        new ResultModelV2(ResultModelV2.Status.CREATE_ROOM.getStatus(),
-                                MappedRoomModel.convertToMap(room),
-                                ResultModelV2.Status.CREATE_ROOM.name(),
-                                new Date()));
-
-            });
-        } else {
-            System.out.println("loi !!!!!");
-        }
+        roomServiceImpl.findOrCreateRoom(json);
     }
 
     //client phan hoi da nhan duoc phong chat (khong con su dung)
@@ -113,10 +82,10 @@ public class WebSocketController {
 
     //gui tin nhan den phong chat
     @MessageMapping("/chat.sendMessage/{roomId}")
-    @SendTo("/room/{roomId}")
-    public String sendMessage(@Payload String message, @DestinationVariable String roomId) {
+//    @SendTo("/room/{roomId}")
+    public void sendMessage(@Payload String message, @DestinationVariable String roomId) {
         System.out.println(message);
-        return messageServiceImpl.saveMessage(message);
+        messageServiceImpl.saveMessage(message);
     }
 
     //gui phan hoi trang thai tin nhan den phong chat
@@ -148,6 +117,27 @@ public class WebSocketController {
                 new ResultModelV2(ResultModelV2.Status.ADD_FRIEND_REQUEST.getStatus(),
                         convertToListBy5Record,
                         ResultModelV2.Status.ADD_FRIEND_REQUEST.name(),
+                        new Date()));
+    }
+
+    //gui yeu cau ket ban
+    @MessageMapping("/unfriend")
+    public void unFriend(@Payload String json) {
+        System.out.println(json);
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("idRequest");
+        int idfriend = jSONObject.getInt("idFriend");
+        friendServiceImpl.unFriend(id, idfriend);
+        sendingOperations.convertAndSend("/room/user/" + id,
+                new ResultModelV2(ResultModelV2.Status.UNFRIEND.getStatus(),
+                        json,
+                        ResultModelV2.Status.UNFRIEND.name(),
+                        new Date()));
+
+        sendingOperations.convertAndSend("/room/user/" + idfriend,
+                new ResultModelV2(ResultModelV2.Status.UNFRIEND.getStatus(),
+                        json,
+                        ResultModelV2.Status.UNFRIEND.name(),
                         new Date()));
     }
 

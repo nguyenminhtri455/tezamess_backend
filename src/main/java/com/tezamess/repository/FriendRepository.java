@@ -11,6 +11,8 @@ public interface FriendRepository {
 
     void addFriend(int id, int idfriend);
 
+    void unFriend(int id, int idfriend);
+
     void disAgreeAddFriend(int id, int idfriend);
 
     void requestAddFriend(int idUserRequest, int idUserFriend);

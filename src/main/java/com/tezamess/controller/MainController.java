@@ -1,14 +1,11 @@
 package com.tezamess.controller;
 
-import com.tezamess.map.MappedRoomModel;
-import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.ResultModelV2.Status;
-import com.tezamess.model.RoomModel;
-import com.tezamess.model.UserModel;
 import com.tezamess.model.WelcomeModel;
 import com.tezamess.repositoryimpl.FriendRepositoryImpl;
 import com.tezamess.serviceimpl.FriendServiceImpl;
+import com.tezamess.serviceimpl.MessageServiceImpl;
 import com.tezamess.serviceimpl.RoomServiceImpl;
 
 import com.tezamess.serviceimpl.UserServiceImpl;
@@ -36,6 +33,9 @@ public class MainController implements ErrorController {
 
     @Autowired
     private RoomServiceImpl roomServiceImpl;
+
+    @Autowired
+    private MessageServiceImpl messageServiceImpl;
 
     @Autowired
     private FriendServiceImpl friendServiceImpl;
@@ -106,6 +106,24 @@ public class MainController implements ErrorController {
     @PostMapping("tezamess/api-recoverpassword")
     public ResponseEntity<Object> recoverPassword(@RequestBody(required = false) String json) {
         return userServiceImpl.recoverPassword(json);
+    }
+
+    @PostMapping("tezamess/api-savemessage")
+    public void saveMessage(@RequestBody(required = true) String json) {
+        System.out.println(json);
+        messageServiceImpl.saveMessage(json);
+    }
+
+    @PostMapping("tezamess/api/createRoom")
+    public void createRoom(@RequestHeader(value = "authorization") String token, @RequestBody(required = true) String json) {
+        System.out.println(json);
+        roomServiceImpl.findOrCreateRoom(json);
+    }
+
+    @PutMapping("tezamess/api/updateRoom")
+    public void updateRoom(@RequestHeader(value = "authorization") String token, @RequestBody(required = true) String json) {
+        System.out.println(json);
+        roomServiceImpl.updateRoom(json);
     }
 
     //test

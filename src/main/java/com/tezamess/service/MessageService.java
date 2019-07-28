@@ -5,7 +5,7 @@ import java.util.Map;
 
 public interface MessageService {
 
-    String saveMessage(String json);
+    void saveMessage(String json);
 
     List<Map<String, Object>> getMessageaUnread(int id);
 

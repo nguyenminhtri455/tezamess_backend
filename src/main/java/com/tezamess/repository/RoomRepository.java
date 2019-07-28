@@ -7,6 +7,10 @@ public interface RoomRepository {
 
     RoomModel createRoom(String name, int idCreateUser, List<Integer> listId);
 
+    RoomModel createRoom(String name, String avatar, int idCreateUser, List<Integer> listId);
+    
+    RoomModel updateRoom(RoomModel roomModel);
+
     void deleteRoom(int id);
 
     RoomModel findRoom(int id);

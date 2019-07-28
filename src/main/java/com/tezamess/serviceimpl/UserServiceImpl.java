@@ -397,6 +397,7 @@ public class UserServiceImpl implements UserService {
                         m.put("creator", t.getRoom().getCreator().getId());
                         m.put("name", t.getRoom().getName());
                         m.put("type", t.getRoom().getTypeRoomModel().getId());
+                        m.put("avatar", t.getRoom().getAvatar());
                         m.put("size", t.getRoom().getParticipationModels().size());
 
                         //Danh sach thanh vien trong phong

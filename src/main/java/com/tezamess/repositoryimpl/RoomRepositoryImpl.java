@@ -29,29 +29,6 @@ public class RoomRepositoryImpl implements RoomRepository {
 
     @Override
     public RoomModel createRoom(String name, int idCreateUser, List<Integer> listId) {
-//        Session session = sessionFactory.getCurrentSession();
-//        RoomModel room = new RoomModel();
-//        if (!name.isEmpty()) {
-//            room.setName(name);
-//            room.setTypeRoomModel(new TypeRoomModel("G"));
-//        } else {
-//            room.setTypeRoomModel(new TypeRoomModel("D"));
-//        }
-//        if (idCreateUser != -1) {
-//            room.setCreator(new UserModel(idCreateUser));
-//        }
-//
-//        session.save(room);
-//
-//        Query query = session.createQuery("From UserModel WHERE id IN :ids", UserModel.class);
-//
-//        query.setParameterList("ids", listId);
-//        List<UserModel> resultList = query.getResultList();
-//        Set<UserModel> set = new HashSet<UserModel>(resultList);
-//        room.setUserModelList(set);
-//        return room;
-
-//-------------------------------------------------
         Session session = sessionFactory.getCurrentSession();
         RoomModel room = new RoomModel();
         if (!name.isEmpty()) {
@@ -77,11 +54,41 @@ public class RoomRepositoryImpl implements RoomRepository {
             ParticipationModel participationModel = new ParticipationModel();
             participationModel.setRoom(room);
             participationModel.setUser(t);
-//            if (t.getId() == idCreateUser) {
-//                participationModel.setStatus(1);
-//            } else {
-//                participationModel.setStatus(0);
-//            }
+            participationModels.add(participationModel);
+            session.save(participationModel);
+        });
+        Set<ParticipationModel> set = new HashSet<>(participationModels);
+        room.setParticipationModels(set);
+        return room;
+    }
+
+    @Override
+    public RoomModel createRoom(String name, String avatar, int idCreateUser, List<Integer> listId) {
+        Session session = sessionFactory.getCurrentSession();
+        RoomModel room = new RoomModel();
+        if (!name.isEmpty()) {
+            room.setName(name);
+            room.setTypeRoomModel(new TypeRoomModel("G"));
+        } else {
+            room.setTypeRoomModel(new TypeRoomModel("D"));
+        }
+        if (idCreateUser != -1) {
+            room.setCreator(new UserModel(idCreateUser));
+        }
+        room.setAvatar(avatar);
+        session.save(room);
+
+        Query query = session.createQuery("From UserModel WHERE id IN :ids", UserModel.class);
+
+        query.setParameterList("ids", listId);
+        List<UserModel> resultList = query.getResultList();
+
+        List<ParticipationModel> participationModels = new ArrayList();
+        resultList.stream().forEach(t -> {
+
+            ParticipationModel participationModel = new ParticipationModel();
+            participationModel.setRoom(room);
+            participationModel.setUser(t);
             participationModels.add(participationModel);
             session.save(participationModel);
         });
@@ -235,10 +242,26 @@ public class RoomRepositoryImpl implements RoomRepository {
         if (room.getCreator().getId() == idUser) {
             for (ParticipationModel p : room.getParticipationModels()) {
                 room.setCreator(p.getUser());
-                session.saveOrUpdate(room);      
+                session.saveOrUpdate(room);
                 break;
             }
         }
         return room;
     }
+
+    @Override
+    public RoomModel updateRoom(RoomModel roomModel) {
+        Session session = sessionFactory.getCurrentSession();
+        RoomModel room = session.get(RoomModel.class, roomModel.getId());
+        if (room != null) {
+            if (roomModel.getName() != null) {
+                room.setName(roomModel.getName());
+            }
+            if (roomModel.getAvatar() != null) {
+                room.setAvatar(roomModel.getAvatar());
+            }
+        }
+        return room;
+    }
+
 }

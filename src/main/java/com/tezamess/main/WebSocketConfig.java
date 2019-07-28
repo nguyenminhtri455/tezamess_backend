@@ -2,12 +2,16 @@ package com.tezamess.main;
 
 import com.tezamess.component.HttpHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.server.jetty.JettyRequestUpgradeStrategy;
+import org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 @Configuration
 @EnableWebSocket
@@ -19,17 +23,18 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.enableSimpleBroker("/topic","/room");
-        registry.setApplicationDestinationPrefixes("/app","/chat","/addfriend");
+        registry.enableSimpleBroker("/topic", "/room");
+        registry.setApplicationDestinationPrefixes("/app", "/chat", "/addfriend");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/tezamess","/ws")
+        registry.addEndpoint("/tezamess", "/ws")
                 .setAllowedOrigins("*")
                 .addInterceptors(handshakeInterceptor).withSockJS();
 //        registry.addEndpoint("/tezamess","/ws")
 //                .setAllowedOrigins("*")
 //                .addInterceptors(handshakeInterceptor);
     }
+
 }

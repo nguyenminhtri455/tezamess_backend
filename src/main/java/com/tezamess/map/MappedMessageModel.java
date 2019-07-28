@@ -2,6 +2,7 @@ package com.tezamess.map;
 
 import com.tezamess.model.MessageModel;
 import com.tezamess.model.TempMessageModel;
+import com.tezamess.model.TypeMessageModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,18 @@ public class MappedMessageModel {
         jSONObject.put("user", messageModel.getUserid().getId());
         jSONObject.put("room", messageModel.getRoomid().getId());
         jSONObject.put("status", "Sent");
-        jSONObject.put("type", "Chat");
+        switch (messageModel.getTypeMessageModel().getId()) {
+            case "C":
+                jSONObject.put("type", "Chat");
+                break;
+            case "I":
+                jSONObject.put("type", "Image");
+                break;
+            case "F":
+                jSONObject.put("type", "File");
+                break;
+        }
+
         return jSONObject.toString();
     }
 
@@ -30,7 +42,19 @@ public class MappedMessageModel {
         jSONObject.put("body", messageModel.getBody());
         jSONObject.put("user", messageModel.getUserid().getId());
         jSONObject.put("room", messageModel.getRoomid().getId());
-        jSONObject.put("type", "Chat");    
+
+        switch (messageModel.getTypeMessageModel().getId()) {
+            case "C":
+                jSONObject.put("type", "Chat");
+                break;
+            case "I":
+                jSONObject.put("type", "Image");
+                break;
+            case "F":
+                jSONObject.put("type", "File");
+                break;
+        }
+
         switch (tempMessageModel.getStatusMessage()) {
             case -1:
                 jSONObject.put("status", "Unread");
@@ -56,7 +80,18 @@ public class MappedMessageModel {
         map.put("user", messageModel.getUserid().getId());
         map.put("room", messageModel.getRoomid().getId());
         map.put("status", "Sent");
-        map.put("type", "Chat");
+
+        switch (messageModel.getTypeMessageModel().getId()) {
+            case "C":
+                map.put("type", "Chat");
+                break;
+            case "I":
+                map.put("type", "Image");
+                break;
+            case "F":
+                map.put("type", "File");
+                break;
+        }
         return map;
     }
 
@@ -70,7 +105,17 @@ public class MappedMessageModel {
             m1.put("room", t.getRoomid().getId());
             m1.put("user", t.getUserid().getId());
             m1.put("status", "Received");
-            m1.put("type", "Chat");
+            switch (t.getTypeMessageModel().getId()) {
+                case "C":
+                    m1.put("type", "Chat");
+                    break;
+                case "I":
+                    m1.put("type", "Image");
+                    break;
+                case "F":
+                    m1.put("type", "File");
+                    break;
+            }
             list.add(m1);
         });
         return list;

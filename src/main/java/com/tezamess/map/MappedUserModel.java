@@ -31,7 +31,7 @@ public class MappedUserModel {
         map.put("id", user.getId());
         map.put("phone", user.getPhone());
         map.put("name", user.getName());
-        map.put("birthday", user.getBirthday());
+        map.put("birthday", user.getBirthday().getTime());
         map.put("gender", user.getGender());
         map.put("urlavatar", user.getUrlavatar());
         map.put("lastactive", user.getLastactive().getTime());
@@ -84,36 +84,7 @@ public class MappedUserModel {
         map.put("urlavatar", user.getUrlavatar());
         map.put("lastactive", user.getLastactive());
         List<Map<String, Object>> rooms = new ArrayList<>();
-//        user.getRoomModelList().stream()
-//                .forEach(t -> {
-//                    Map<String, Object> m = new HashMap<>();
-//                    m.put("id", t.getId());
-//                    m.put("creator", t.getCreator().getId());
-//                    m.put("name", t.getName());
-//                    m.put("type", t.getTypeRoomModel().getId());
-//                    m.put("size", t.getUserModelList().size());
-////                    if (t.getTypeRoomModel().getId().equals("D")) {
-//                    //Danh sach thanh vien trong phong
-//                    List<Map<String, Object>> members = new ArrayList<>();
-//                    t.getUserModelList().stream().forEach(s -> {
-//                        Map<String, Object> member = convertToMapBy4Record(s);
-//                        members.add(member);
-//                    });
-//                    m.put("members", members);
-////                    }
-//                    rooms.add(m);
-//
-//                    //Danh sach tin nhan trong phong
-//                    List<Map<String, Object>> messages = new ArrayList<>();
-//                    t.getMessageList().stream()
-//                            .sorted((t1, t2) -> t1.getId().compareTo(t2.getId()))
-//                            //                            .sorted(Comparator.comparingInt(MessageModel::getId).reversed())
-//                            .forEach(a -> {
-//                                Map<String, Object> message = MappedMessageModel.convertMessageChat(a);
-//                                messages.add(message);
-//                            });
-//                    m.put("messages", messages);
-//                });
+
         user.getParticipationModels().stream()
                 .forEach(t -> {
                     Map<String, Object> m = new HashMap<>();
@@ -121,6 +92,7 @@ public class MappedUserModel {
                     m.put("creator", t.getRoom().getCreator().getId());
                     m.put("name", t.getRoom().getName());
                     m.put("type", t.getRoom().getTypeRoomModel().getId());
+                    m.put("avatar", t.getRoom().getAvatar());
                     m.put("size", t.getRoom().getParticipationModels().size());
                     //Danh sach thanh vien trong phong
                     List<Map<String, Object>> members = new ArrayList<>();

@@ -177,4 +177,17 @@ public class FriendRepositoryImpl implements FriendRepository {
         }
 
     }
+
+    @Override
+    public void unFriend(int id, int idfriend) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("DELETE FROM FriendModel f"
+                + " WHERE (f.userRequest.id = :userRequest"
+                + " AND f.userFriend.id = :userFriend) OR "
+                + "(f.userFriend.id = :userRequest"
+                + " AND f.userRequest.id = :userFriend)");
+        query.setParameter("userRequest", id);
+        query.setParameter("userFriend", idfriend);
+        query.executeUpdate();
+    }
 }

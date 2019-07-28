@@ -34,7 +34,7 @@ public class MessageRepositoryImpl implements MessageRepository {
 
         query.setParameter("idmember", message.getUserid().getId());
         query.setParameter("idRoom", message.getRoomid().getId());
-
+        
         List<TempMessageModel> resultList = query.getResultList();
         if (resultList.size() == 1) {
             resultList.get(0).setIdmessage(message);

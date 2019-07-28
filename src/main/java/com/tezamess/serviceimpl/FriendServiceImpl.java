@@ -95,4 +95,9 @@ public class FriendServiceImpl implements FriendService {
         friendRepositoryImpl.updateOrDeleteStatusAddFriend(id, status);
     }
 
+    @Override
+    public void unFriend(int id, int idfriend) {
+        friendRepositoryImpl.unFriend(id, idfriend);
+    }
+
 }

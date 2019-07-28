@@ -8,7 +8,9 @@ public interface RoomService {
 
     RoomModel findRoom(int idRoom);
 
-    RoomModel findOrCreateRoom(String json);
+    void findOrCreateRoom(String json);
+    
+    void updateRoom(String json);
 
     void changeStatusReceivedRoom(int id, int idRoom);
 
