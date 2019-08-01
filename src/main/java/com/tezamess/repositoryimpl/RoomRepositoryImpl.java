@@ -115,27 +115,6 @@ public class RoomRepositoryImpl implements RoomRepository {
 
     @Override
     public RoomModel findRoom(List<Integer> listId) {
-//        Session session = sessionFactory.getCurrentSession();
-//        Query query = session.createSQLQuery("SELECT * FROM participation as p"
-//                + " WHERE p.userid IN :ids"
-//                + " GROUP BY p.roomid"
-//                + " HAVING COUNT(*) = :size");
-//        query.setParameterList("ids", listId);
-//        query.setParameter("size", listId.size());
-//        List<Object[]> resultList = query.getResultList();
-//        for (Object[] o : resultList) {
-//            RoomModel room = session.get(RoomModel.class, (int) o[0]);
-//            List<Integer> collect = room.getUserModelList().stream()
-//                    .map(UserModel::getId)
-//                    .collect(Collectors.toList());
-//            collect.removeAll(listId);
-//            if (collect.size() == 0) {
-//                return room;
-//            }
-//        };
-//        return null;
-
-//-------------------------------------------------
         Session session = sessionFactory.getCurrentSession();
         Query query = session.createSQLQuery("SELECT * FROM participation as p"
                 + " WHERE p.userid IN :ids"

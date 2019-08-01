@@ -133,6 +133,18 @@ public class MappedMessageModel {
                     m1.put("createdate", t.getCreatedate().getTime());
                     m1.put("room", t.getRoomid().getId());
                     m1.put("user", t.getUserid().getId());
+                    m1.put("status", "Seen");
+                    switch (t.getTypeMessageModel().getId()) {
+                        case "C":
+                            m1.put("type", "Chat");
+                            break;
+                        case "I":
+                            m1.put("type", "Image");
+                            break;
+                        case "F":
+                            m1.put("type", "File");
+                            break;
+                    }
                     list.add(m1);
                 });
         return list;

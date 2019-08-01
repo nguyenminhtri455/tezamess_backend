@@ -72,7 +72,7 @@ public class RoomServiceImpl implements RoomService {
                     }
 
                 } else {
-                    room = roomRepositoryImpl.findRoom(listId);
+//                    room = roomRepositoryImpl.findRoom(listId);
                     if (room == null) {
                         room = roomRepositoryImpl.
                                 createRoom(nameRoom,

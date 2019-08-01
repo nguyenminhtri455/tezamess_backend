@@ -3,7 +3,6 @@ package com.tezamess.controller;
 import com.tezamess.map.MappedRoomModel;
 import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ChatMessage;
-import com.tezamess.model.ParticipationModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.UserModel;
@@ -12,9 +11,9 @@ import com.tezamess.serviceimpl.MessageServiceImpl;
 import com.tezamess.serviceimpl.RoomServiceImpl;
 import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -295,11 +294,29 @@ public class WebSocketController {
         int id = jSONObject.getInt("id");
         String phone = jSONObject.getString("phone");
         UserModel userByPhone = userServiceImpl.getUserByPhone(phone);
-        sendingOperations.convertAndSend("/room/user/" + id,
-                new ResultModelV2(ResultModelV2.Status.FIND_FRIEND.getStatus(),
-                        MappedUserModel.convertToMapBy4Record(userByPhone),
-                        ResultModelV2.Status.FIND_FRIEND.name(),
-                        new Date()));
+        if (jSONObject.has("caller")) {
+            if (userByPhone != null) {
+                sendingOperations.convertAndSend("/room/user/" + id,
+                        new ResultModelV2(ResultModelV2.Status.FIND_MEMBER_INVITE_ROOM.getStatus(),
+                                MappedUserModel.convertToMapBy4Record(userByPhone),
+                                ResultModelV2.Status.FIND_MEMBER_INVITE_ROOM.name(),
+                                new Date()));
+            } else {
+                sendingOperations.convertAndSend("/room/user/" + id,
+                        new ResultModelV2(ResultModelV2.Status.FIND_MEMBER_INVITE_ROOM.getStatus(),
+                                new HashMap(),
+                                ResultModelV2.Status.FIND_MEMBER_INVITE_ROOM.name(),
+                                new Date()));
+            }
+
+        } else {
+            sendingOperations.convertAndSend("/room/user/" + id,
+                    new ResultModelV2(ResultModelV2.Status.FIND_FRIEND.getStatus(),
+                            MappedUserModel.convertToMapBy4Record(userByPhone),
+                            ResultModelV2.Status.FIND_FRIEND.name(),
+                            new Date()));
+        }
+
     }
 
     //them thanh vien vao nhom 
