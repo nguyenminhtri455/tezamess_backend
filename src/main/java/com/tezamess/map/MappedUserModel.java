@@ -4,13 +4,20 @@ import com.tezamess.model.MessageModel;
 import com.tezamess.model.UserModel;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MappedUserModel {
+
+    public static Map<String, Object> convertToUser4Record(UserModel user) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", user.getId());
+        map.put("phone", user.getPhone());
+        map.put("name", user.getName());
+        map.put("urlavatar", user.getUrlavatar());
+        return map;
+    }
 
     public static Map<String, Object> convertToMap(UserModel user) {
         Map<String, Object> map = new HashMap<>();
@@ -115,6 +122,31 @@ public class MappedUserModel {
                     m.put("messages", messages);
                 });
         map.put("rooms", rooms);
+        return map;
+    }
+
+    public static Map<String, Object> convertToJsonDetailStatusMessage(List<UserModel> userReceived, List<UserModel> userSeen) {
+        Map<String, Object> map = new HashMap<>();
+        if (userReceived.size() > 0) {
+            List<Map<String, Object>> receiveds = new ArrayList();
+            userReceived.stream().forEach(r -> {
+                Map<String, Object> receiver = convertToUser4Record(r);
+                receiveds.add(receiver);
+            });
+            map.put("received", receiveds);
+        } else {
+            map.put("received", null);
+        }
+        if (userSeen.size() > 0) {
+            List<Map<String, Object>> seens = new ArrayList();
+            userSeen.stream().forEach(s -> {
+                Map<String, Object> seener = convertToUser4Record(s);
+                seens.add(seener);
+            });
+            map.put("seen", seens);
+        } else {
+            map.put("seen", null);
+        }
         return map;
     }
 }

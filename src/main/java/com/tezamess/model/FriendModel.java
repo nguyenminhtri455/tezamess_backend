@@ -31,7 +31,7 @@ public class FriendModel implements Serializable {
     //status = 0 (da gui yeu cau ket ban)
     //status = 1 (da dong y yeu cau ket ban nhung nguoi yeu cau chua nhan duoc)
     //status = -1 (khong dong y yeu cau ket ban nhung nguoi yeu cau chua nhan duoc)
-    //status = 2 (da la ban be)
+    //status = 2 (da la ban be (nguoi yeu cau da nhan duoc va thiet lap trang thai lai bang 2))
     @Column(name = "status")
     private Integer status;
 

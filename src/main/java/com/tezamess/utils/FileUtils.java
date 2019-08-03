@@ -7,7 +7,7 @@ import java.util.Base64;
 
 public class FileUtils {
 
-//    private final String path = "http://192.168.0.102:8080/profile/";
+//    private final String path = "http://192.168.0.104:8080/profile/";
 //    private final String path = "http://172.16.26.173:8080/profile/";
 //    private final String root = "/tezamess/src/main/resources/static/profile";
     private final String path = "http://tezamess-tezamess.b9ad.pro-us-east-1.openshiftapps.com/profile/";

@@ -14,6 +14,6 @@ public interface MessageService {
     String updateStatusMessage(String json);
 
     String checkStatusMessage(String json);
-    
-    
+
+    void checkDetailStatusMessage(String json);
 }

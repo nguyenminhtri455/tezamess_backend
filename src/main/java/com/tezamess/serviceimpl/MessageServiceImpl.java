@@ -1,7 +1,9 @@
 package com.tezamess.serviceimpl;
 
 import com.tezamess.map.MappedMessageModel;
+import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.MessageModel;
+import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;
 import com.tezamess.model.TempMessageModel;
 import com.tezamess.model.TypeMessageModel;
@@ -10,7 +12,9 @@ import com.tezamess.repositoryimpl.MessageRepositoryImpl;
 import com.tezamess.service.MessageService;
 import com.tezamess.utils.FileUtils;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.json.JSONException;
@@ -71,7 +75,7 @@ public class MessageServiceImpl implements MessageService {
             }
 
             MessageModel message = messageRepositoryImpl.saveMessage(messageModel);
-            
+
             messagingTemplate.convertAndSend("/room/" + roomId,
                     MappedMessageModel.convertToJsonMessageChat(messageModel));
 
@@ -174,6 +178,79 @@ public class MessageServiceImpl implements MessageService {
     public List<Map<String, Object>> loadMessages(int idRoom, int start, int count) {
         List<MessageModel> loadMessages = messageRepositoryImpl.loadMessages(idRoom, start, count);
         return MappedMessageModel.convertListMessageChatNoStatus(loadMessages);
+    }
+
+    @Override
+    public void checkDetailStatusMessage(String json) {
+        JSONObject jSONObject;
+        try {
+            //kiem tra input data khac null
+            if (json == null) {
+                throw new IOException();
+            }
+            jSONObject = new JSONObject(json);
+            MessageModel messageModel = new MessageModel();
+            int id = jSONObject.getInt("id");
+            int roomId = jSONObject.getInt("room");
+            int senderId = jSONObject.getInt("user");
+            messageModel.setId(id);
+            messageModel.setRoomid(new RoomModel(roomId));
+            messageModel.setUserid(new UserModel(senderId));
+
+            List<TempMessageModel> listDetailStatusMessage = messageRepositoryImpl.checkDetailStatusMessage(messageModel);
+            if (listDetailStatusMessage != null) {
+                List<UserModel> userReceived = new ArrayList();
+                List<UserModel> userSeen = new ArrayList();
+                listDetailStatusMessage.stream().forEach(t -> {
+                    if (t.getIdmessage().getId() > messageModel.getId()) {
+                        switch (t.getStatusMessage()) {
+                            case 0:
+                            case 2:
+                                userSeen.add(t.getIdmember());
+                                break;
+                            case 1:
+                                int status = messageRepositoryImpl
+                                        .checkStatusMessageSeenOrRecevied(t.getIdmessage().getId(),
+                                                messageModel.getId(), t.getIdmember().getId(),
+                                                roomId);
+                                if (status == 1) {
+                                    userReceived.add(t.getIdmember());
+                                } else {
+                                    userSeen.add(t.getIdmember());
+                                }
+                                break;
+                        }
+                    } else {
+                        switch (t.getStatusMessage()) {
+                            case 1:
+                                userReceived.add(t.getIdmember());
+                                break;
+                            case 2:
+                                userSeen.add(t.getIdmember());
+                                break;
+                        }
+                    }
+
+                });
+                Map<String, Object> result = MappedUserModel.convertToJsonDetailStatusMessage(userReceived, userSeen);
+                messagingTemplate.convertAndSend("/room/user/" + senderId,
+                        new ResultModelV2(ResultModelV2.Status.CHECK_DETAIL_STATUS_MESSAGE.getStatus(),
+                                result,
+                                ResultModelV2.Status.CHECK_DETAIL_STATUS_MESSAGE.name(),
+                                new Date()));
+            } else {
+                messagingTemplate.convertAndSend("/room/user/" + senderId,
+                        new ResultModelV2(ResultModelV2.Status.CHECK_DETAIL_STATUS_MESSAGE.getStatus(),
+                                new HashMap(),
+                                ResultModelV2.Status.CHECK_DETAIL_STATUS_MESSAGE.name(),
+                                new Date()));
+            }
+
+        } catch (IOException | JSONException ex) {
+            System.out.println(ex.getMessage() + " checkDetailStatusMessage 1");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage() + " checkDetailStatusMessage 2");
+        }
     }
 
 }

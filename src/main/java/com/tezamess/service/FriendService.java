@@ -13,6 +13,8 @@ public interface FriendService {
     void unFriend(int id, int idfriend);
 
     void requestAddFriend(int idUserRequest, int idUserFriend);
+    
+    void cancelRequestAddFriend(String json);
 
     List<Map<String, Object>> getRequestAddFriend(int idUserFriend);
 

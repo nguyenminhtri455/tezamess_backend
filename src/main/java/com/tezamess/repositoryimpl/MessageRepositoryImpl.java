@@ -34,7 +34,7 @@ public class MessageRepositoryImpl implements MessageRepository {
 
         query.setParameter("idmember", message.getUserid().getId());
         query.setParameter("idRoom", message.getRoomid().getId());
-        
+
         List<TempMessageModel> resultList = query.getResultList();
         if (resultList.size() == 1) {
             resultList.get(0).setIdmessage(message);
@@ -227,4 +227,57 @@ public class MessageRepositoryImpl implements MessageRepository {
         return resultList;
     }
 
+    @Override
+    public List<TempMessageModel> checkDetailStatusMessage(MessageModel messageModel) {
+        Session ss = sessionFactory.getCurrentSession();
+        Query<TempMessageModel> query = ss.createQuery("FROM TempMessageModel t"
+                + " WHERE t.idRoom.id = :idRoom", TempMessageModel.class
+        );
+        query.setParameter("idRoom", messageModel.getRoomid().getId());
+
+        List<TempMessageModel> resultList = query.getResultList();
+        if (resultList.size() > 0) {
+            List<TempMessageModel> listDetailStatusMessage = new ArrayList();
+            for (TempMessageModel t : resultList) {
+                if (Objects.equals(t.getIdmember().getId(), messageModel.getUserid().getId())) {
+                    continue;
+                }
+                if (t.getIdmessage().getId() > messageModel.getId()) {
+                    System.out.println(t.getIdmember().getName() + " name checkDetailStatusMessage Resonsitory");
+                    listDetailStatusMessage.add(t);
+                    continue;
+                }
+                if ((Objects.equals(t.getIdmessage().getId(), messageModel.getId())) && t.getStatusMessage() >= 1) {
+                    System.out.println(t.getIdmember().getName() + " name checkDetailStatusMessage Resonsitory");
+                    listDetailStatusMessage.add(t);
+                }
+            }
+            if (listDetailStatusMessage.size() > 0) {
+                return listDetailStatusMessage;
+            } else {
+                return null;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int checkStatusMessageSeenOrRecevied(int idMessageCurrent, int idMessageCheck, int idUser, int idRoom) {
+        Session ss = sessionFactory.getCurrentSession();
+//        m.id BETWEEN :idMessageCurrent AND :idMessageCheck
+        Query query = ss.createQuery("SELECT COUNT(m.id) FROM MessageModel m"
+                + " WHERE m.user.id = :idUser"
+                + " AND m.room.id = :idRoom"
+                + " AND m.id BETWEEN :idMessageCheck AND :idMessageCurrent");
+        query.setParameter("idUser", idUser);
+        query.setParameter("idRoom", idRoom);
+        query.setParameter("idMessageCurrent", idMessageCurrent);
+        query.setParameter("idMessageCheck", idMessageCheck);
+        long status = (Long) query.uniqueResult();
+        if (status == 0) {
+            return 1;
+        } else {
+            return 2;
+        }
+    }
 }

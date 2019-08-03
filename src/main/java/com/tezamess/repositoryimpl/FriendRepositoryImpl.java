@@ -94,11 +94,19 @@ public class FriendRepositoryImpl implements FriendRepository {
     @Override
     public void requestAddFriend(int idUserRequest, int idUserFriend) {
         Session session = sessionFactory.getCurrentSession();
-        FriendModel friendModel = new FriendModel();
-        friendModel.setUserRequest(new UserModel(idUserRequest));
-        friendModel.setUserFriend(new UserModel(idUserFriend));
-        friendModel.setStatus(0);
-        session.save(friendModel);
+        Query query = session.createQuery("FROM FriendModel f WHERE"
+                + " (f.userRequest.id = :idUserRequest AND f.userFriend.id = :idUserFriend)"
+                + " OR (f.userFriend.id = :idUserRequest AND f.userRequest.id = :idUserFriend)");
+        query.setParameter("idUserRequest", idUserRequest);
+        query.setParameter("idUserFriend", idUserFriend);
+        List resultList = query.getResultList();
+        if (resultList.size() <= 0) {
+            FriendModel friendModel = new FriendModel();
+            friendModel.setUserRequest(new UserModel(idUserRequest));
+            friendModel.setUserFriend(new UserModel(idUserFriend));
+            friendModel.setStatus(0);
+            session.save(friendModel);
+        }
     }
 
     //request cua nguoi yeu cau ket ban
@@ -189,5 +197,29 @@ public class FriendRepositoryImpl implements FriendRepository {
         query.setParameter("userRequest", id);
         query.setParameter("userFriend", idfriend);
         query.executeUpdate();
+    }
+
+    @Override
+    public int cancelRequestAddFriend(int id, int idfriend) {
+        Session session = sessionFactory.getCurrentSession();
+        Query query = session.createQuery("FROM FriendModel f WHERE"
+                + " f.userRequest.id = :idUserRequest AND f.userFriend.id = :idUserFriend", FriendModel.class);
+        query.setParameter("idUserRequest", id);
+        query.setParameter("idUserFriend", idfriend);
+        List<FriendModel> resultList = query.getResultList();
+        FriendModel friend;
+        if (resultList.size() > 0) {
+            friend = resultList.get(0);
+            if (friend.getStatus() == 0) {
+                session.delete(friend);
+                //tra ve 0 neu huy yeu cau thanh cong
+                return friend.getStatus();
+            }
+        } else {
+            //tra ve -1 neu khong co ton tai trong database
+            return -2;
+        }
+        //tra ve -1 ,1 hoac 2 (co ton tai trong database nhung la trang thai khac)
+        return friend.getStatus();
     }
 }

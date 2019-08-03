@@ -119,7 +119,7 @@ public class WebSocketController {
                         new Date()));
     }
 
-    //gui yeu cau ket ban
+    //gui yeu cau huy ban be
     @MessageMapping("/unfriend")
     public void unFriend(@Payload String json) {
         System.out.println(json);
@@ -138,6 +138,13 @@ public class WebSocketController {
                         json,
                         ResultModelV2.Status.UNFRIEND.name(),
                         new Date()));
+    }
+
+    //gui yeu cau huy bo loi moi ket ban
+    @MessageMapping("/cancel/request.addfriend")
+    public void cancelRequestAddfriend(@Payload String json) {
+        System.out.println(json + " cancel/request.addfriend");
+        friendServiceImpl.cancelRequestAddFriend(json);
     }
 
     //phan hoi yeu cau ket ban
@@ -280,16 +287,23 @@ public class WebSocketController {
     @MessageMapping("/check/messages.status/{roomId}")
     @SendTo("/room/{roomId}")
     public String checkStatusMessage(@Payload String json, @DestinationVariable String roomId) {
-        System.out.println(json);
+        System.out.println(json + " /check/messages.status/{roomId}");
         String checkStatusMessage = messageServiceImpl.checkStatusMessage(json);
         return checkStatusMessage;
+    }
+
+    //kiem tra chi tiet trang thai tin nhan
+    @MessageMapping("/check/detail/messages.status")
+    public void checkDetailStatusMessage(@Payload String json) {
+        System.out.println(json + " /check/messages.status");
+        messageServiceImpl.checkDetailStatusMessage(json);
     }
 
     //tim user 
     @MessageMapping("/find.user")
     public void findUser(@Payload String json) {
         // Add username in web socket session     
-        System.out.println(json);
+        System.out.println(json + " /find.user");
         JSONObject jSONObject = new JSONObject(json);
         int id = jSONObject.getInt("id");
         String phone = jSONObject.getString("phone");
@@ -322,14 +336,14 @@ public class WebSocketController {
     //them thanh vien vao nhom 
     @MessageMapping("/invite/member")
     public void inviteMember(@Payload String json) {
-        System.out.println(json);
+        System.out.println(json + " /invite/member");
         roomServiceImpl.inviteMembers(json);
     }
 
     //roi khoi nhom chat
     @MessageMapping("/leave/room")
     public void leaveRoom(@Payload String json) {
-        System.out.println(json);
+        System.out.println(json + " /leave/room");
         roomServiceImpl.leaveRoom(json);
     }
 

@@ -19,6 +19,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,6 +31,9 @@ public class FriendServiceImpl implements FriendService {
 
     @Autowired
     private FriendRepositoryImpl friendRepositoryImpl;
+
+    @Autowired
+    private SimpMessagingTemplate sendingOperations;
 
     @Override
     public ResponseEntity<Object> getFriends(String json) {
@@ -98,6 +102,41 @@ public class FriendServiceImpl implements FriendService {
     @Override
     public void unFriend(int id, int idfriend) {
         friendRepositoryImpl.unFriend(id, idfriend);
+    }
+
+    @Override
+    public void cancelRequestAddFriend(String json) {
+        JSONObject jSONObject = new JSONObject(json);
+        int id = jSONObject.getInt("idRequest");
+        int idfriend = jSONObject.getInt("idFriend");
+        int cancelRequestAddFriend = friendRepositoryImpl.cancelRequestAddFriend(id, idfriend);
+
+        switch (cancelRequestAddFriend) {
+            case 0:
+                sendingOperations.convertAndSend("/room/user/" + id,
+                        new ResultModelV2(ResultModelV2.Status.CANCEL_REQUEST_ADDFRIEND.getStatus(),
+                                json,
+                                ResultModelV2.Status.CANCEL_REQUEST_ADDFRIEND.name(),
+                                new Date()));
+
+                sendingOperations.convertAndSend("/room/user/" + idfriend,
+                        new ResultModelV2(ResultModelV2.Status.CANCEL_REQUEST_ADDFRIEND.getStatus(),
+                                json,
+                                ResultModelV2.Status.CANCEL_REQUEST_ADDFRIEND.name(),
+                                new Date()));
+                break;
+            case -2:
+                sendingOperations.convertAndSend("/room/user/" + id,
+                        new ResultModelV2(ResultModelV2.Status.CANCEL_REQUEST_ADDFRIEND.getStatus(),
+                                json,
+                                ResultModelV2.Status.CANCEL_REQUEST_ADDFRIEND.name(),
+                                new Date()));
+                break;
+            case -1:
+            case 1:
+            case 2:
+
+        }
     }
 
 }

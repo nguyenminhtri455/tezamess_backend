@@ -1,5 +1,6 @@
 package com.tezamess.repository;
 
+import com.tezamess.model.FriendModel;
 import com.tezamess.model.UserModel;
 import java.util.List;
 
@@ -12,6 +13,8 @@ public interface FriendRepository {
     void addFriend(int id, int idfriend);
 
     void unFriend(int id, int idfriend);
+
+    int cancelRequestAddFriend(int id, int idfriend);
 
     void disAgreeAddFriend(int id, int idfriend);
 
