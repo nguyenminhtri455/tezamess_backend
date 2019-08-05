@@ -1,7 +1,6 @@
 package com.tezamess.serviceimpl;
 
 import com.tezamess.map.MappedRoomModel;
-import com.tezamess.map.MappedUserModel;
 import com.tezamess.model.ParticipationModel;
 import com.tezamess.model.ResultModelV2;
 import com.tezamess.model.RoomModel;

@@ -339,6 +339,7 @@ public class WebSocketController {
         System.out.println(json + " /invite/member");
         roomServiceImpl.inviteMembers(json);
     }
+    
 
     //roi khoi nhom chat
     @MessageMapping("/leave/room")

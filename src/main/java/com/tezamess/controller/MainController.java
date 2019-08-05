@@ -7,6 +7,7 @@ import com.tezamess.repositoryimpl.FriendRepositoryImpl;
 import com.tezamess.serviceimpl.FriendServiceImpl;
 import com.tezamess.serviceimpl.MessageServiceImpl;
 import com.tezamess.serviceimpl.RoomServiceImpl;
+import com.tezamess.serviceimpl.StatusServiceImpl;
 
 import com.tezamess.serviceimpl.UserServiceImpl;
 import java.util.Date;
@@ -39,6 +40,9 @@ public class MainController implements ErrorController {
 
     @Autowired
     private FriendServiceImpl friendServiceImpl;
+
+    @Autowired
+    private StatusServiceImpl statusServiceImpl;
 
     @GetMapping(value = {"/", "/tezamess"})
     public ResponseEntity<Object> welcome() {
@@ -124,6 +128,24 @@ public class MainController implements ErrorController {
     public void updateRoom(@RequestHeader(value = "authorization") String token, @RequestBody(required = true) String json) {
         System.out.println(json);
         roomServiceImpl.updateRoom(json);
+    }
+
+    @PostMapping("tezamess/api/postStatus")
+    public void postStatus(@RequestHeader(value = "authorization") String token, @RequestBody(required = true) String json) {
+        System.out.println("post status calleddddddddddddddddddddddddddddddddd");
+        statusServiceImpl.postStatus(json);
+    }
+    
+    @PostMapping("tezamess/api/getStatuses")
+    public void getStatuses(@RequestHeader(value = "authorization") String token, @RequestBody(required = true) String json) {
+        System.out.println("get status calleddddddddddddddddddddddddddddddddd");
+        statusServiceImpl.getStatuses(json);
+    }
+    
+    @PostMapping("tezamess/api/loadMoreStatused")
+    public void loadMoreStatused(@RequestHeader(value = "authorization") String token, @RequestBody(required = true) String json) {
+        System.out.println("loadmore status calleddddddddddddddddddddddddddddddddd");
+        statusServiceImpl.loadMoreStatused(json);
     }
 
     //test

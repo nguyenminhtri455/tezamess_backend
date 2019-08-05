@@ -37,10 +37,12 @@ public class FriendRepositoryImpl implements FriendRepository {
         friends.stream().forEach(t -> {
             if (idUser != t.getUserFriend().getId()) {
                 listUser.add(session.get(UserModel.class, t.getUserFriend().getId()));
-            }
-            if (idUser != t.getUserRequest().getId()) {
+            } else {
                 listUser.add(session.get(UserModel.class, t.getUserRequest().getId()));
             }
+//            if (idUser != t.getUserRequest().getId()) {
+//                listUser.add(session.get(UserModel.class, t.getUserRequest().getId()));
+//            }
         });
         return listUser;
     }

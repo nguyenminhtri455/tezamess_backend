@@ -2,7 +2,6 @@ package com.tezamess.map;
 
 import com.tezamess.model.MessageModel;
 import com.tezamess.model.TempMessageModel;
-import com.tezamess.model.TypeMessageModel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
