@@ -2,6 +2,7 @@ package com.tezamess.repositoryimpl;
 
 import com.tezamess.model.MediaModel;
 import com.tezamess.model.StatusModel;
+import com.tezamess.model.UserModel;
 import com.tezamess.repository.StatusRepository;
 import java.util.List;
 import org.hibernate.Session;
@@ -31,6 +32,8 @@ public class StatusRepositoryImpl implements StatusRepository {
         }).forEachOrdered((mediaModel) -> {
             session.save(mediaModel);
         });
+        UserModel get = session.get(UserModel.class, statusModel.getUserPostStatus().getId());
+        statusModel.setUserPostStatus(get);
         return statusModel;
     }
 

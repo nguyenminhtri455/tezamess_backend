@@ -27,12 +27,13 @@ public class FriendRepositoryImpl implements FriendRepository {
 
         Query query = session.createQuery("FROM FriendModel as f "
                 + "WHERE f.status IN :status AND (f.userRequest.id = :id "
-                + "OR f.userFriend.id = :id)");
+                + "OR f.userFriend.id = :id)", FriendModel.class);
 
         query.setParameterList("status", Arrays.asList(1, 2));
         query.setParameter("id", idUser);
 
         List<FriendModel> friends = query.getResultList();
+        System.out.println(friends.size() + " ddddddddddddddddddddddddddddddddddddddddddddddddddddd");
 
         friends.stream().forEach(t -> {
             if (idUser != t.getUserFriend().getId()) {

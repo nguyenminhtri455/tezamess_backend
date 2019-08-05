@@ -13,7 +13,7 @@ public class MappedStatusModel {
         map.put("id", statusModel.getId());
         map.put("createdate", statusModel.getCreatedate().getTime());
         map.put("body", statusModel.getBody());
-        map.put("userid", statusModel.getUserPostStatus().getId());
+        map.put("user", MappedUserModel.convertToUser4Record(statusModel.getUserPostStatus()));
         if (!statusModel.getListMediaModel().isEmpty()) {
             map.put("images", statusModel.getListMediaModel());
         }
