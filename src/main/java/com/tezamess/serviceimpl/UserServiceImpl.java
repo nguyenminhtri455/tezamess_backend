@@ -358,9 +358,9 @@ public class UserServiceImpl implements UserService {
         List<UserModel> friends = friendRepository.getFriends(userId);
         // ket ban voi admin
         UserModel admin = null;
-        if (userId != 1000 && !friends.contains(new UserModel(1000))) {
-            friendRepository.addFriendAdmin(userId, 1000);
-            admin = userRepositoryImpl.findUserById(1000);
+        if (userId != 1 && !friends.contains(new UserModel(1))) {
+            friendRepository.addFriendAdmin(userId, 1);
+            admin = userRepositoryImpl.findUserById(1);
             friends.add(admin);
         }
         //thong bao online den ban be
